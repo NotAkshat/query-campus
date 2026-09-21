@@ -1,0 +1,39 @@
+@startuml
+!include _style.puml
+
+rectangle "Chat User" as user
+usecase "5.0\nValidate\nQuestion" as p5
+usecase "6.0\nEmbed Query" as p6
+rectangle "Voyage AI" as voyage
+usecase "7.0\nSimilarity Search\n(top-k = 6)" as p7
+database "D2  Pinecone\nvector index" as d2
+usecase "8.0\nAssemble\nContext Block" as p8
+usecase "9.0\nGenerate\nGrounded Answer" as p9
+rectangle "Google Gemini" as gem
+usecase "10.0\nDe-duplicate\nSources by URL" as p10
+
+user --> p5 : { question }
+p5 --> p6 : trimmed question
+p6 --> voyage : text (input_type=query)
+voyage --> p6 : query vector
+p6 --> p7 : query vector
+p7 --> d2 : similarity query
+d2 --> p7 : top-6 chunks + metadata
+p7 --> p8 : matches
+p8 --> p9 : context excerpts + question
+p9 --> gem : system instruction + context
+gem --> p9 : answer text
+p9 --> p10 : answer + matches
+p10 --> user : { answer, sources[] }
+
+note bottom of p5
+  Blank or non-string question
+  returns HTTP 400; no external
+  call is made (REQ-33).
+end note
+note bottom of p7
+  Zero matches returns a fixed
+  refusal message and skips
+  generation (REQ-37).
+end note
+@enduml

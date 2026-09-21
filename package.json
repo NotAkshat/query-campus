@@ -1,0 +1,11 @@
+{
+  "name": "query-campus",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev:backend": "pnpm --filter backend start:dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "scrape": "pnpm --filter backend scrape",
+    "ingest": "pnpm --filter backend ingest"
+  }
+}

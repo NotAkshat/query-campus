@@ -1,0 +1,42 @@
+@startuml
+!include _style.puml
+left to right direction
+skinparam packageStyle rectangle
+skinparam nodesep 14
+skinparam ranksep 60
+
+actor "Chat User" as chatuser
+actor "Content\nOperator" as operator
+
+rectangle "Query Campus" {
+  usecase "UC-1\nAsk a question" as uc1
+  usecase "UC-2\nAsk a suggested question" as uc2
+  usecase "UC-3\nVerify an answer\nvia source link" as uc3
+  usecase "UC-4\nReceive a refusal" as uc4
+  usecase "UC-5\nCrawl the website" as uc5
+  usecase "UC-6\nIndex the corpus" as uc6
+  usecase "UC-7\nResume interrupted\nindexing run" as uc7
+  usecase "UC-8\nMonitor service health" as uc8
+}
+
+chatuser --> uc2
+chatuser --> uc1
+chatuser --> uc3
+chatuser --> uc4
+operator --> uc5
+operator --> uc6
+operator --> uc7
+operator --> uc8
+
+uc2 ..> uc1 : <<include>>
+uc4 ..> uc1 : <<extend>>
+uc7 ..> uc6 : <<extend>>
+
+actor "Student" as student
+actor "Prospective\nApplicant" as applicant
+actor "Administrative\nStaff" as staff
+
+student -up-|> chatuser
+applicant -up-|> chatuser
+staff -up-|> chatuser
+@enduml

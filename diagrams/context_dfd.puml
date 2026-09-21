@@ -1,0 +1,25 @@
+@startuml
+!include _style.puml
+left to right direction
+
+rectangle "Student /\nProspective Applicant" as user
+rectangle "Content Operator" as op
+rectangle "IET DAVV Website\n(HTML + PDF)" as site
+rectangle "Voyage AI\nEmbeddings API" as voyage
+rectangle "Pinecone\nVector Database" as pine
+rectangle "Google Gemini\nGeneration API" as gem
+
+usecase "0\n\nQuery Campus\nRAG System" as sys #EAF2F8
+
+user --> sys : natural-language question
+sys --> user : grounded answer + cited sources
+op --> sys : scrape / ingest command
+sys --> site : HTTP GET (same-origin)
+site --> sys : page and PDF text
+sys --> voyage : text to embed
+voyage --> sys : dense vectors
+sys --> pine : upsert / similarity query
+pine --> sys : top-k chunks + metadata
+sys --> gem : context excerpts + question
+gem --> sys : generated answer
+@enduml

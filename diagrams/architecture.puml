@@ -1,0 +1,52 @@
+@startuml
+!include _style.puml
+skinparam linetype ortho
+top to bottom direction
+
+rectangle "  Presentation Layer  " as L1 {
+  component "React 19 + Vite Single-Page Application\nChat UI  ·  Markdown answers  ·  Source citations" as fe
+}
+
+rectangle "  Application Layer — NestJS REST API (TypeScript)  " as L2 {
+  together {
+    component "RagController\nPOST /query" as ctrl
+    component "AppController\nGET /health" as health
+  }
+  component "RagService\nretrieve + generate" as rag
+  component "IngestionService\nchunk · embed · upsert" as ing
+  component "ScraperService\nAxios · Cheerio · pdf-parse" as scr
+  together {
+    component "EmbeddingsService" as emb
+    component "VectorStoreService" as vs
+  }
+}
+
+rectangle "  External Managed Services  " as L3 {
+  component "Voyage AI\nembeddings" as voyage
+  component "Pinecone\nvector index" as pine
+  component "Google Gemini\nLLM generation" as gem
+}
+
+rectangle "IET DAVV Website\nHTML pages + PDF circulars" as site
+database "scraped.json\ncrawled corpus" as corpus
+
+fe --> ctrl : HTTP / JSON
+ctrl --> rag
+rag --> emb
+rag --> vs
+ing --> emb
+ing --> vs
+emb --> voyage : HTTPS
+vs --> pine : HTTPS
+rag --> gem : HTTPS
+
+site --> scr : HTTP GET (same-origin)
+scr --> corpus : writes
+corpus --> ing : reads
+
+note right of L2
+  Online query path:  RagController -> RagService
+  Offline indexing path:  ScraperService -> IngestionService
+  (command line only, not reachable over HTTP)
+end note
+@enduml

@@ -1,0 +1,53 @@
+@startuml
+!include _style.puml
+
+class ScrapedDocument {
+  + url : string  <<PK>>
+  + title : string
+  + content : string
+  + type : 'html' | 'pdf'
+}
+
+class Chunk {
+  + id : string  <<PK = sha1(url#index)>>
+  + text : string
+  + url : string  <<FK>>
+  + title : string
+  + type : 'html' | 'pdf'
+}
+
+class VectorRecord {
+  + id : string  <<PK>>
+  + values : float[1024]
+  + metadata : ChunkMetadata
+}
+
+class ChunkMetadata {
+  + url : string
+  + title : string
+  + text : string
+  + type : 'html' | 'pdf'
+}
+
+class RagSource {
+  + url : string
+  + title : string
+}
+
+class RagAnswer {
+  + answer : string
+  + sources : RagSource[]
+}
+
+ScrapedDocument "1" --> "1..*" Chunk : chunkDocument()\n1500 chars / 200 overlap
+Chunk "1" --> "1" VectorRecord : embed + upsert
+VectorRecord *-- ChunkMetadata
+VectorRecord "6" ..> "1..6" RagSource : retrieved, then\nde-duplicated by URL
+RagAnswer o-- RagSource
+
+note bottom of ScrapedDocument
+  Reference corpus: 565 documents
+  (147 HTML + 418 PDF) yielding
+  1,896 chunks — mean 3.4 per document.
+end note
+@enduml

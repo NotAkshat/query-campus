@@ -1,0 +1,27 @@
+@startuml
+!include _style.puml
+
+rectangle "IET DAVV Website" as site
+usecase "1.0\nCrawl &\nExtract Text" as p1
+database "D1  scraped.json\n(crawled corpus)" as d1
+usecase "2.0\nChunk Documents\n1500 chars / 200 overlap" as p2
+usecase "3.0\nEmbed Chunks\n(batch of 5, paced)" as p3
+rectangle "Voyage AI" as voyage
+usecase "4.0\nUpsert Vectors\n+ metadata" as p4
+database "D2  Pinecone\nvector index" as d2
+database "D3  ingest-progress.json\n(checkpoint)" as d3
+rectangle "Content Operator" as op
+
+op --> p1 : pnpm run scrape
+site --> p1 : HTML pages, PDF files
+p1 --> d1 : ScrapedDocument[]
+op --> p2 : pnpm run ingest
+d1 --> p2 : documents
+p2 --> p3 : Chunk[]
+p3 --> voyage : texts (input_type=document)
+voyage --> p3 : vectors[1024]
+p3 --> p4 : chunk + vector
+p4 --> d2 : id, values, metadata
+p4 --> d3 : nextIndex, total
+d3 --> p2 : resume position
+@enduml

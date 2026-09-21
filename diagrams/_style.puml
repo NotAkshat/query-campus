@@ -1,0 +1,42 @@
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 13
+skinparam dpi 160
+skinparam roundCorner 6
+skinparam ArrowColor #2F4858
+skinparam ArrowFontSize 11
+skinparam rectangle {
+  BackgroundColor #F4F7FA
+  BorderColor #2F4858
+  FontColor #14212B
+}
+skinparam usecase {
+  BackgroundColor #EAF2F8
+  BorderColor #2F4858
+}
+skinparam database {
+  BackgroundColor #FDF3E3
+  BorderColor #2F4858
+}
+skinparam component {
+  BackgroundColor #F4F7FA
+  BorderColor #2F4858
+}
+skinparam actor {
+  BackgroundColor #EAF2F8
+  BorderColor #2F4858
+}
+skinparam state {
+  BackgroundColor #F4F7FA
+  BorderColor #2F4858
+  FontColor #14212B
+}
+skinparam class {
+  BackgroundColor #F4F7FA
+  BorderColor #2F4858
+}
+skinparam note {
+  BackgroundColor #FFFDF0
+  BorderColor #B8A36A
+}

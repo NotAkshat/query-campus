@@ -1,0 +1,9 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+apps/backend/data/scraped.json
+apps/backend/data/ingest-progress.json
+*.log
+.DS_Store

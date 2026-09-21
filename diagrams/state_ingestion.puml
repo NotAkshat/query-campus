@@ -1,0 +1,28 @@
+@startuml
+!include _style.puml
+skinparam ranksep 30
+skinparam nodesep 28
+
+state "Prepare Run" as Prepare : load scraped.json ·\nensure vector index (REQ-23) ·\nchunk 1500 / 200 overlap
+state Resume <<choice>>
+state "Embed Batch" as Embed : 5 chunks, input_type = document
+state "Upsert Batch" as Upsert : id + vector + metadata
+state "Write Checkpoint" as Write : nextIndex, total
+state "Sleep 21 s" as Sleep : stay within rate limit
+state Failed : retries exhausted;\ncheckpoint retained
+state Done : checkpoint deleted;\nindex fully populated
+
+[*] --> Prepare : pnpm run ingest
+Prepare --> Resume
+Resume --> Embed : no checkpoint — start at 0
+Resume --> Embed : checkpoint — resume at nextIndex
+Embed --> Embed : retry on 429 / 5xx / transport\n(backoff, max 10 — REQ-26/27)
+Embed -right-> Failed : retries exhausted
+Embed --> Upsert : vectors returned
+Upsert --> Write
+Write --> Sleep : chunks remaining
+Sleep -left-> Embed
+Write --> Done : final batch complete
+Done --> [*]
+Failed --> [*]
+@enduml

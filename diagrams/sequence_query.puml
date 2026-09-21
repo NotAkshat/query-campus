@@ -1,0 +1,53 @@
+@startuml
+!include _style.puml
+
+actor "Chat User" as user
+participant "React SPA" as ui
+participant "RagController" as ctrl
+participant "RagService" as rag
+participant "EmbeddingsService" as emb
+participant "VectorStoreService" as vs
+participant "Voyage AI" as voyage
+participant "Pinecone" as pine
+participant "Google Gemini" as gem
+
+user -> ui : type question, submit
+activate ui
+ui -> ui : append message,\nshow "Thinking…"
+ui -> ctrl : POST /query { question }
+activate ctrl
+ctrl -> ctrl : validate + trim (REQ-33/34)
+ctrl -> rag : answer(question)
+activate rag
+
+rag -> emb : embedOne(question, "query")
+activate emb
+emb -> voyage : POST /v1/embeddings
+voyage --> emb : vector[1024]
+emb --> rag : query vector
+deactivate emb
+
+rag -> vs : query(vector, topK = 6)
+activate vs
+vs -> pine : similarity query
+pine --> vs : top-6 chunks + metadata
+vs --> rag : matches
+deactivate vs
+
+alt no matches
+  rag --> ctrl : fixed refusal, sources = []
+else matches found
+  rag -> rag : assemble context block
+  rag -> gem : generateContent(system + context + question)
+  gem --> rag : grounded answer text
+  rag -> rag : de-duplicate sources by URL
+  rag --> ctrl : { answer, sources[] }
+end
+deactivate rag
+
+ctrl --> ui : 200 { answer, sources[] }
+deactivate ctrl
+ui -> ui : render Markdown + source links
+ui --> user : answer with citations
+deactivate ui
+@enduml

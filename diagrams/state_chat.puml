@@ -1,0 +1,27 @@
+@startuml
+!include _style.puml
+
+[*] --> Empty : page load
+
+state Empty : suggestion chips shown
+state Pending : "Thinking…" indicator\ninput and Send disabled
+state Answered : answer rendered as Markdown\nwith de-duplicated source links
+state Error : error-styled assistant message
+
+Empty --> Pending : submit question /\nclick suggestion chip
+Answered --> Pending : submit another question
+Error --> Pending : user retries
+
+Pending --> Answered : HTTP 200 { answer, sources }
+Pending --> Error : network failure or non-2xx
+Pending --> Pending : submission ignored (REQ-49)
+
+Answered --> [*] : reload — history not persisted
+Error --> [*] : reload — history not persisted
+
+note right of Pending
+  Concurrent requests are prevented:
+  submissions while pending are
+  ignored (REQ-49).
+end note
+@enduml
