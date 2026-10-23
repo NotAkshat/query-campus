@@ -36,7 +36,7 @@
  },
  {
   "id": "h_1",
-  "label": "2.2.1 Steps followed during development",
+  "label": "2.2.1 Steps followed",
   "level": 3
  },
  {
@@ -101,7 +101,7 @@
  },
  {
   "id": "h_10",
-  "label": "3.3.2.6 UC6: Index Content (Chunk, Embed, Upsert)",
+  "label": "3.3.2.6 UC6: Index Content",
   "level": 3
  },
  {
@@ -111,7 +111,7 @@
  },
  {
   "id": "h_12",
-  "label": "3.3.2.8 UC8: Run Accuracy Evaluation",
+  "label": "3.3.2.8 UC8: Run Accuracy Test",
   "level": 3
  },
  {
@@ -121,12 +121,12 @@
  },
  {
   "id": "h_14",
-  "label": "3.3.2.10 UC10: Retrieve Relevant Chunks (included use case)",
+  "label": "3.3.2.10 UC10: Retrieve Relevant Chunks (included)",
   "level": 3
  },
  {
   "id": "h_15",
-  "label": "3.3.2.11 UC11: Generate Grounded Answer (included use case)",
+  "label": "3.3.2.11 UC11: Generate Grounded Answer (included)",
   "level": 3
  },
  {
@@ -146,7 +146,7 @@
  },
  {
   "id": "h_18",
-  "label": "Architectural strategy",
+  "label": "Architecture strategy",
   "level": 3
  },
  {
@@ -301,17 +301,12 @@
  },
  {
   "id": "h_42",
-  "label": "D. Configuration Variables",
+  "label": "D. Main Settings",
   "level": 2
  },
  {
   "id": "h_43",
-  "label": "E. REST Interface Summary",
-  "level": 2
- },
- {
-  "id": "h_44",
-  "label": "F. Deployment",
+  "label": "E. Deployment",
   "level": 2
  }
 ]
