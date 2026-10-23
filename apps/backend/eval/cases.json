@@ -1,0 +1,307 @@
+{
+  "$comment": "Accuracy eval for Query Campus. Expected facts were checked against the live site on 2026-10-02; timetable cases change every semester. Matching is case-insensitive substring. In 'all', an array entry means 'any one of these'. 'retrieval' = URL substrings, one of which must be among the chunks sent to the model. 'attachments': 'none', or groups of alternative title/URL substrings that must each be attached. 'sources': 'none' requires no cited sources.",
+  "cases": [
+    {
+      "id": "rohit-pathak-who",
+      "question": "Who is Rohit Pathak?",
+      "expect": {
+        "retrieval": [
+          "applied-science-faculty-list"
+        ],
+        "answer": {
+          "all": [
+            "Associate Professor"
+          ]
+        },
+        "attachments": "none"
+      }
+    },
+    {
+      "id": "rohit-pathak-teaches",
+      "question": "What does Rohit Pathak teach?",
+      "expect": {
+        "retrieval": [
+          "#faculty-dr-rohit-pathak"
+        ],
+        "answer": {
+          "all": [
+            "Discrete Mathematics",
+            "Numerical Analysis"
+          ]
+        },
+        "attachments": "none"
+      }
+    },
+    {
+      "id": "vedpriya-dongre-classes",
+      "question": "Which classes does Vedpriya Dongre teach?",
+      "expect": {
+        "retrieval": [
+          "#faculty-dr-vedpriya-dongre"
+        ],
+        "answer": {
+          "all": [
+            "Artificial Intelligence",
+            [
+              "IV Year",
+              "4th year",
+              "fourth year"
+            ]
+          ]
+        },
+        "attachments": "none"
+      }
+    },
+    {
+      "id": "class-coordinator-iv-cse-b",
+      "question": "Who is the class coordinator of 4th year CSE section B?",
+      "expect": {
+        "retrieval": [
+          "timetable.ietonline.in"
+        ],
+        "answer": {
+          "all": [
+            "Vedpriya Dongre"
+          ]
+        },
+        "attachments": "none"
+      }
+    },
+    {
+      "id": "sufia-aziz-research",
+      "question": "What is the research interest of Dr. Sufia Aziz?",
+      "expect": {
+        "retrieval": [
+          "applied-science-faculty-list"
+        ],
+        "answer": {
+          "all": [
+            "Discrete Mathematics",
+            "Linear Algebra"
+          ]
+        }
+      }
+    },
+    {
+      "id": "hod-applied-science",
+      "question": "Who is the HOD of Applied Science?",
+      "expect": {
+        "retrieval": [
+          "applied-science-faculty-list"
+        ],
+        "answer": {
+          "all": [
+            "Shashi Prakash"
+          ]
+        }
+      }
+    },
+    {
+      "id": "hemant-makwana",
+      "question": "Tell me about Hemant Makwana",
+      "expect": {
+        "retrieval": [
+          "faculty-information-technology"
+        ],
+        "answer": {
+          "all": [
+            "Professor",
+            [
+              "Computer Graphics",
+              "Head of Department",
+              "HOD"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "ashesh-tiwari",
+      "question": "Who is Ashesh Tiwari?",
+      "expect": {
+        "retrieval": [
+          "mech-faculty-list"
+        ],
+        "answer": {
+          "all": [
+            "Professor",
+            [
+              "Mechanical",
+              "Head of Department",
+              "HOD"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "vijay-kumar-karma",
+      "question": "Who is Vijay Kumar Karma?",
+      "expect": {
+        "retrieval": [
+          "civil-faculty-list"
+        ],
+        "answer": {
+          "all": [
+            "Professor",
+            [
+              "Civil",
+              "Head of Department",
+              "HOD"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "ravi-sindal",
+      "question": "Who is Ravi Sindal?",
+      "expect": {
+        "retrieval": [
+          "faculty-electronics-telecommunication-engg"
+        ],
+        "answer": {
+          "all": [
+            "Professor",
+            [
+              "VLSI",
+              "Electronics"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "lalit-gehlod",
+      "question": "What is Lalit Gehlod's designation?",
+      "expect": {
+        "retrieval": [
+          "index.php/faculty"
+        ],
+        "answer": {
+          "all": [
+            "Associate Professor"
+          ]
+        }
+      }
+    },
+    {
+      "id": "btech-fees",
+      "question": "What are the B.Tech fees?",
+      "expect": {
+        "retrieval": [
+          "Mandatory_Disc"
+        ],
+        "answer": {
+          "all": [
+            "45,000"
+          ]
+        },
+        "attachments": "none"
+      }
+    },
+    {
+      "id": "be-branches",
+      "question": "Which B.E. branches does IET DAVV offer?",
+      "expect": {
+        "answer": {
+          "all": [
+            "Computer Science",
+            "Information Technology",
+            "Civil",
+            "Mechanical"
+          ]
+        },
+        "attachments": "none"
+      }
+    },
+    {
+      "id": "send-iv-cse-b-timetable",
+      "question": "Send me the 4th year CSE section B timetable",
+      "expect": {
+        "retrieval": [
+          "timetable.ietonline.in/pdf/"
+        ],
+        "attachments": [
+          [
+            "Computer Science Engineering IV Year Section B"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "send-ii-it-timetable",
+      "question": "Send me the 2nd year IT timetable",
+      "expect": {
+        "attachments": [
+          [
+            "Information Technology II Year Section A",
+            "IIyr_IT_A"
+          ],
+          [
+            "Information Technology II Year Section B",
+            "IIyr_IT_B"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "unanswerable",
+      "question": "What is the address of the IET DAVV campus on Mars?",
+      "expect": {
+        "answer": {
+          "all": [
+            [
+              "don't have",
+              "do not have",
+              "couldn't find",
+              "could not find",
+              "not available",
+              "no information"
+            ]
+          ]
+        },
+        "sources": "none",
+        "attachments": "none"
+      }
+    },
+    {
+      "id": "exam-timetable",
+      "question": "How do I check the exam timetable?",
+      "expect": {
+        "answer": {
+          "all": [
+            [
+              "don't have",
+              "do not have",
+              "couldn't find",
+              "could not find",
+              "not found",
+              "not available",
+              "no exam",
+              "not able to find"
+            ]
+          ]
+        },
+        "attachments": "none"
+      }
+    },
+    {
+      "id": "exam-results",
+      "question": "Where can I see the exam results?",
+      "expect": {
+        "retrieval": [
+          "/index.php/results"
+        ],
+        "answer": {
+          "all": [
+            [
+              "result"
+            ]
+          ]
+        },
+        "attachments": "none"
+      }
+    }
+  ]
+}

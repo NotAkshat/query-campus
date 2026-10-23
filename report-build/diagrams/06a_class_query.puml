@@ -1,0 +1,89 @@
+@startuml
+!include common.iuml
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #eaf1fb
+  BorderColor #1f3b63
+  HeaderBackgroundColor #cfdcf0
+}
+skinparam nodesep 12
+skinparam ranksep 30
+title Class Diagram (1 of 2): Query Service Classes
+
+class RagController {
+  -logger: Logger
+  +query(body: QueryDto): Promise<RagAnswer>
+  +stream(body: QueryDto, res: Response): Promise<void>
+}
+
+class DocumentsController {
+  +download(url: string, res: Response): Promise<void>
+  -validate(url: string): URL
+}
+
+class AppController {
+  +health(): {status: string}
+}
+
+class RagService {
+  -skipModelUntil: Map<string, number>
+  +answer(question: string): Promise<RagAnswer>
+  +stream(question, signal?): AsyncGenerator<RagStreamEvent>
+  +retrieve(question: string): Promise<Chunk[]>
+  -assertConfigured(): void
+  -finalize(raw, matches): RagAnswer
+  -generate(question, context, signal?): AsyncGenerator<string>
+  -openFirstChunk(model, apiKey, question, context, signal?)
+  -openStream(model, apiKey, question, context, signal?): Readable
+}
+
+class KeywordSearchService {
+  -builtAt: number
+  +search(query: string, limit: number): Promise<KeywordMatch[]>
+  +isReady(): boolean
+  +whenReady(): Promise<void>
+  +warmUp(): void
+  -load(): Promise<Index>
+  -initialBuild(): Promise<Index>
+  -refresh(): Promise<void>
+  -buildIndex(chunks: Chunk[]): Index
+  -syncWithPinecone(cached: Chunk[]): Promise<SyncResult>
+}
+
+class EmbeddingsService {
+  -queryCache: Map<string, number[]>
+  +embed(texts: string[], inputType, retry?): Promise<number[][]>
+  +embedOne(text: string, inputType): Promise<number[]>
+}
+
+class VectorStoreService {
+  +ensureIndex(): Promise<void>
+  +upsert(records: VectorRecord[]): Promise<void>
+  +query(vector: number[], topK: number): Promise<QueryMatch[]>
+  +listIds(prefix?: string): Promise<string[]>
+  +fetchByIds(ids: string[]): Promise<Chunk[]>
+  +deleteByPrefix(prefix: string): Promise<number>
+}
+
+class RagAnswer <<interface>> {
+  +answer: string
+  +sources: RagSource[]
+  +attachments: RagSource[]
+}
+
+class RagSource <<interface>> {
+  +url: string
+  +title: string
+  +type: 'html' | 'pdf'
+}
+class "withRetry()" as WR <<function>>
+RagController --> RagService
+RagService --> EmbeddingsService
+RagService --> VectorStoreService
+RagService --> KeywordSearchService
+KeywordSearchService --> VectorStoreService
+RagService ..> RagAnswer : returns
+RagAnswer "1" *-- "0..*" RagSource
+EmbeddingsService ..> WR
+VectorStoreService ..> WR
+@enduml

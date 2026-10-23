@@ -21,8 +21,11 @@ async function main() {
   const progressPath = join(__dirname, '../../data/ingest-progress.json');
   const documents: ScrapedDocument[] = JSON.parse(readFileSync(dataPath, 'utf-8'));
 
+  // --incremental: embed only chunks that are not in the index yet (no checkpoint needed, safe to re-run).
+  const incremental = process.argv.includes('--incremental');
+
   let startIndex = 0;
-  if (existsSync(progressPath)) {
+  if (!incremental && existsSync(progressPath)) {
     const progress: Progress = JSON.parse(readFileSync(progressPath, 'utf-8'));
     startIndex = progress.nextIndex;
     console.log(`Found checkpoint: resuming from chunk ${startIndex}`);
@@ -31,7 +34,9 @@ async function main() {
   console.log(`Ingesting ${documents.length} documents...`);
   await ingestion.ingest(documents, {
     startIndex,
+    skipExisting: incremental,
     onBatchComplete: (nextIndex, total) => {
+      if (incremental) return;
       if (nextIndex >= total) {
         if (existsSync(progressPath)) unlinkSync(progressPath);
       } else {

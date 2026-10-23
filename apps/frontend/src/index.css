@@ -1,11 +1,56 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Theme: calm and light, using the cream / sand / grey / coral palette. */
+@theme {
+  /* Palette: EAE7DC cream, D8C3A5 sand, 8E8D8A grey, E98074 soft coral, E85A4F coral. Text is a dark shade of the grey. */
+  --color-page: #eae7dc;
+  --color-paper: #f4f2ea;
+  --color-line: #d8c3a5;
+  --color-fg: #0e0d0c;
+  --color-muted: #4f4e4a;
+  --color-accent: #e85a4f;
+  --color-soft: #e98074;
+  --color-sand: #d8c3a5;
+  --color-grey: #8e8d8a;
+  --font-serif: ui-serif, 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+}
+
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  background: var(--color-page);
+  color: var(--color-fg);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Slow-scrolling row of topic pills on the home screen */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  animation: marquee 40s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation: none;
+  }
+}
+
+/* Chat area: faint dot grid and two soft colour washes so long chats don't feel flat */
+.chat-bg {
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(232, 90, 79, 0.08), transparent 38%),
+    radial-gradient(circle at 92% 90%, rgba(216, 195, 165, 0.25), transparent 40%),
+    radial-gradient(rgba(46, 45, 43, 0.09) 1px, transparent 1px);
+  background-size: auto, auto, 22px 22px;
 }

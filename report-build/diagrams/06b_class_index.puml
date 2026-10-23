@@ -1,0 +1,58 @@
+@startuml
+!include common.iuml
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #eaf1fb
+  BorderColor #1f3b63
+  HeaderBackgroundColor #cfdcf0
+}
+skinparam nodesep 12
+skinparam ranksep 30
+title Class Diagram (2 of 2): Indexing Classes and Data Types
+
+class IngestionService {
+  +ingest(documents: ScrapedDocument[], options: IngestOptions): Promise<void>
+}
+
+class ScraperService {
+  +crawl(): Promise<ScrapedDocument[]>
+  -normalizeUrl(url: string): string
+  -isSameSite(url, baseHost): boolean
+  -fetchOne(url, baseHost): Promise<Result>
+  -fetchPdf(url: string): Promise<ScrapedDocument>
+}
+
+class TimetableScraperService {
+  +scrape(): Promise<ScrapedDocument[]>
+  -get(path, params?): Promise<string>
+  -parseTimetables(html, semester): ClassTimetable[]
+  -parseGrid($, table): Slot[]
+  -subjectNames(pdfUrl): Promise<Map>
+}
+
+class ScrapedDocument <<interface>> {
+  +url: string
+  +title: string
+  +content: string
+  +type: 'html' | 'pdf'
+}
+
+class Chunk <<interface>> {
+  +id: string
+  +text: string
+  +url: string
+  +title: string
+  +type: 'html' | 'pdf'
+}
+class EmbeddingsService
+class VectorStoreService
+class "chunkDocument()" as CD <<function>>
+IngestionService --> EmbeddingsService
+IngestionService --> VectorStoreService
+IngestionService ..> CD : uses
+CD ..> ScrapedDocument
+CD ..> Chunk : creates
+ScraperService ..> ScrapedDocument : creates
+TimetableScraperService ..> ScrapedDocument : creates
+IngestionService ..> ScrapedDocument
+@enduml

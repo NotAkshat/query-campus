@@ -1,0 +1,30 @@
+@startuml
+!include common.iuml
+skinparam rectangle {
+  BackgroundColor #eaf1fb
+  BorderColor #1f3b63
+}
+skinparam ranksep 38
+skinparam nodesep 30
+title Layered Block Diagram of Query Campus
+
+rectangle "**PRESENTATION LAYER**  (React 19, Vite, Tailwind CSS)\n\nChat UI (App, MessageBubble, Sidebar, DocumentCard)\nAPI client (SSE stream reader)\nChat store (browser localStorage)" as L1 #dbe7f7
+
+rectangle "**APPLICATION LAYER**  (NestJS REST API, port 3001)\n\nRagController: POST /query, /query/stream\nDocumentsController: GET /documents/download\nAppController: GET /health\nRagService (hybrid retrieval, prompt, generation, citation parsing)\nKeywordSearchService (BM25 index with disk cache)" as L2 #dbe7f7
+
+rectangle "**INTEGRATION LAYER**\n\nEmbeddingsService (Voyage client, query cache)\nVectorStoreService (Pinecone client)\nwithRetry() back-off utility" as L3 #dbe7f7
+
+rectangle "**INDEXING LAYER**  (command-line scripts on a NestJS application context)\n\nScraperService (crawler)\nTimetableScraperService\nIngestionService + chunkDocument()\nEval script" as L4 #f3e6cf
+
+cloud "**EXTERNAL SERVICES**\nVoyage AI (embeddings)    Pinecone (vector database)    Google Gemini (generation)\nIET DAVV website (HTML, PDF)    Timetable portal (timetable.ietonline.in)" as EXT #e4f3e4
+database "Local files: scraped.json, timetables.json,\nkeyword-chunks.json, eval results" as FS #f2f2f2
+
+L1 -down-> L2 : HTTP / JSON / SSE
+L2 -down-> L3 : service calls
+L3 -down-> EXT : HTTPS
+L4 -up-> L3 : embed + upsert
+L4 -down-> EXT : crawl / scrape
+L4 -right-> FS : write
+L2 -right-> FS : cache
+L2 -down-> EXT : Gemini, PDF proxy
+@enduml

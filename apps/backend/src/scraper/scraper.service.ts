@@ -138,7 +138,8 @@ export class ScraperService {
       const parser = new PDFParse({ data: new Uint8Array(res.data) });
       const parsed = await parser.getText();
       await parser.destroy();
-      const content = parsed.text.replace(/\s+/g, ' ').trim();
+      // pdf-parse adds page markers like "-- 1 of 4 --"; they are noise for search.
+      const content = parsed.text.replace(/--\s*\d+\s+of\s+\d+\s*--/g, ' ').replace(/\s+/g, ' ').trim();
       if (content.length < 50) return null;
       return { url, title: url.split('/').pop() ?? url, content, type: 'pdf' };
     } catch (err) {

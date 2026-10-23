@@ -1,0 +1,213 @@
+const { P, bullet, H1, H2, H3, table, figure, spacer } = require('./lib');
+
+// Use case descriptions in the Rational format. Kept short and in plain words.
+const UCS = [
+  {
+    id: 'UC1', name: 'Ask a Question',
+    brief: 'The user types a question and gets a short answer based on the college website.',
+    basic: ['The user types a question and presses Enter.', 'The screen sends the question to the backend.', 'The system finds the best chunks (UC10).', 'The system writes the answer (UC11).', 'The answer appears word by word and is saved in the chat.'],
+    alt: ['A1 The question is blank or longer than 500 characters: the system rejects it with a message.', 'A2 Nothing relevant is found: the system says it could not find an answer.', 'A3 A service fails: the screen shows a short error message.', 'A4 The user sends more than 20 questions in a minute: the system asks the user to wait.'],
+    special: 'The answer must start within a few seconds. No login is needed.',
+    pre: 'The backend is running and the database is filled.',
+    post: 'The answer is shown and saved in the user’s browser. Nothing is stored on the server.',
+    ext: 'View Answer with Sources (UC2); Download Requested Document (UC3).',
+  },
+  {
+    id: 'UC2', name: 'View Streamed Answer with Sources',
+    brief: 'The user reads the answer and opens the pages it came from.',
+    basic: ['The answer appears as it is written.', 'When it is complete, the sources appear under it as links.', 'The user clicks a link to open the original page.'],
+    alt: ['A1 The answer has no sources: no source links are shown.'],
+    special: 'The same source is never shown twice.',
+    pre: 'A question has been sent (UC1).',
+    post: 'The full answer and its links are saved with the chat.',
+    ext: 'None.',
+  },
+  {
+    id: 'UC3', name: 'Download Requested Document',
+    brief: 'When the user asks for a document such as a timetable, a document card with Open and Download buttons is shown.',
+    basic: ['The user asks, for example, “Send me the 4th year CSE section B timetable”.', 'The system finds the document and shows a document card.', 'The user clicks Open to view it, or Download to save it.'],
+    alt: ['A1 The link is not a PDF of the college website: the download is refused.', 'A2 The college website cannot be reached: the system shows a short message.'],
+    special: 'Only PDF files from the college website can be downloaded.',
+    pre: 'The document is in the database.',
+    post: 'The user has opened or saved the document.',
+    ext: 'None.',
+  },
+  {
+    id: 'UC4', name: 'Manage Chat History',
+    brief: 'The user starts new chats, opens old chats and deletes chats.',
+    basic: ['The user clicks “New chat” or picks an old chat in the side panel.', 'The screen shows that chat.', 'The user can delete a chat with the cross button.'],
+    alt: ['A1 The browser blocks local storage: chats work but are lost when the page is reloaded.'],
+    special: 'Chats are saved only in the user’s browser.',
+    pre: 'The website is open in a browser.',
+    post: 'The chat list is updated.',
+    ext: 'None.',
+  },
+  {
+    id: 'UC5', name: 'Crawl College Website',
+    brief: 'The operator collects the text of all pages and PDF files of the college website.',
+    basic: ['The operator runs “pnpm run scrape”.', 'The crawler opens pages one after another and follows links on the same website.', 'It saves the text of each page and PDF.', 'It writes everything into one file.'],
+    alt: ['A1 A page cannot be opened: it is skipped and the crawl continues.'],
+    special: 'The crawler is polite: four pages at a time, with time limits.',
+    pre: 'The operator has set up the project.',
+    post: 'The file scraped.json holds the collected text.',
+    ext: 'None.',
+  },
+  {
+    id: 'UC6', name: 'Index Content',
+    brief: 'The operator saves the collected text in the database so it can be searched.',
+    basic: ['The operator runs “pnpm run ingest” (or adds --incremental for new pages only).', 'The system cuts the text into chunks.', 'It converts the chunks into numbers with Voyage AI.', 'It saves them in Pinecone, a few at a time, and waits when the free limit requires it.'],
+    alt: ['A1 A service is busy: the system waits and tries again.', 'A2 The run stops: the next run continues from where it stopped.'],
+    special: 'Running it again does not create duplicates.',
+    pre: 'scraped.json exists (UC5) and the API keys are set.',
+    post: 'All chunks can be searched.',
+    ext: 'None.',
+  },
+  {
+    id: 'UC7', name: 'Re-index Timetables',
+    brief: 'The operator updates the class and teacher timetables each semester.',
+    basic: ['The operator runs “pnpm run timetables”.', 'The system reads all timetables of the latest session.', 'It makes one document per class and one per teacher.', 'It replaces the old timetable chunks in the database.'],
+    alt: ['A1 With “--dry-run” the documents are only saved to a file.'],
+    special: 'Only timetable chunks are replaced.',
+    pre: 'The timetable website is reachable.',
+    post: 'The database has the current timetables.',
+    ext: 'None.',
+  },
+  {
+    id: 'UC8', name: 'Run Accuracy Test',
+    brief: 'The operator checks the quality of search and answers with a fixed list of questions.',
+    basic: ['The operator runs “pnpm run eval”.', 'For each question the system checks that the right page was found and the right facts are in the answer.', 'It prints pass or fail for each question and compares with the last run.'],
+    alt: ['A1 With “--retrieval-only” only the search is tested.'],
+    special: 'Question numbers are saved, so repeated runs are quick.',
+    pre: 'The database is filled.',
+    post: 'A report of the run is saved.',
+    ext: 'None.',
+  },
+  {
+    id: 'UC9', name: 'Check Service Health',
+    brief: 'The operator checks that the backend is running.',
+    basic: ['The operator opens /health.', 'The system answers “ok”.'],
+    alt: ['A1 The server is down: there is no answer.'],
+    special: 'No login is needed.',
+    pre: 'None.',
+    post: 'None.',
+    ext: 'None.',
+  },
+  {
+    id: 'UC10', name: 'Retrieve Relevant Chunks (included)',
+    brief: 'The system finds the chunks that best match the question.',
+    basic: ['The system searches by meaning and by keywords at the same time.', 'It merges the two result lists.', 'It keeps the best 16 chunks, with at most three from one page.'],
+    alt: ['A1 One of the two searches is not working: the other one is used.'],
+    special: 'For questions about a person, faculty pages come first.',
+    pre: 'The database is filled.',
+    post: 'A list of chunks is ready.',
+    ext: 'None.',
+  },
+  {
+    id: 'UC11', name: 'Generate Grounded Answer (included)',
+    brief: 'The system asks Gemini to write the answer using only the chunks.',
+    basic: ['The system sends the chunks and the question to Gemini.', 'Gemini writes the answer, and the words are sent to the screen as they come.', 'The system turns the citation numbers into source links.'],
+    alt: ['A1 Gemini is busy: the system tries another Gemini model.'],
+    special: 'Gemini must not use facts outside the chunks.',
+    pre: 'Chunks were found.',
+    post: 'The answer and its sources are ready.',
+    ext: 'None.',
+  },
+];
+
+function ucDescription(uc, idx) {
+  const n = `3.3.2.${idx + 1}`;
+  const numberedList = (arr) => arr.map((t, i) => `${i + 1}. ${t}`);
+  const t = table(
+    [1500, 1700, 5826],
+    ['No.', 'Item', 'Description'],
+    [
+      [`${n}.1`, 'Use Case Name', `${uc.id}: ${uc.name}`],
+      [`${n}.2`, 'Brief Description', uc.brief],
+      [`${n}.3.1`, 'Basic Flow', numberedList(uc.basic)],
+      [`${n}.3.2`, 'Alternative Flows', uc.alt],
+      [`${n}.4`, 'Special Requirements', uc.special],
+      [`${n}.5`, 'Preconditions', uc.pre],
+      [`${n}.6`, 'Post Conditions', uc.post],
+      [`${n}.7`, 'Extension Points', uc.ext],
+    ],
+    { cantSplit: false },
+  );
+  return [H3(`${n} ${uc.id}: ${uc.name}`), t, spacer(200)];
+}
+
+function chapter3(img) {
+  const sw = table(
+    [1900, 2700, 4426],
+    ['Part', 'Technology', 'Why we use it'],
+    [
+      ['Backend', 'Node.js, NestJS, TypeScript', 'One language everywhere; NestJS keeps the code in clear modules.'],
+      ['Web crawling', 'Axios, Cheerio, pdf-parse', 'Download pages, read their text, and read text from PDF files.'],
+      ['Keyword search', 'MiniSearch', 'Fast search for exact words such as names and codes.'],
+      ['Embeddings', 'Voyage AI (voyage-3)', 'Turns text into numbers; no GPU needed.'],
+      ['Database', 'Pinecone', 'Stores the numbers and finds the closest ones quickly.'],
+      ['AI answers', 'Google Gemini', 'Fast and low cost; backup models are available.'],
+      ['Frontend', 'React 19, Vite, Tailwind CSS', 'Fast, responsive chat screen.'],
+      ['Testing', 'Vitest, Supertest, oxlint', 'Unit tests, end-to-end tests and code checks.'],
+      ['Project tools', 'pnpm workspaces, .env files', 'One repository for both apps; secret keys stay out of the code.'],
+    ],
+  );
+  const hw = table(
+    [2200, 3400, 3426],
+    ['Item', 'Minimum', 'Reason'],
+    [
+      ['Processor', 'Dual-core', 'The heavy work is done by online services.'],
+      ['Memory', '4 GB (8 GB for development)', 'The search index and the tools need a few hundred MB.'],
+      ['Storage', '1 GB free', 'Collected text, a search copy (about 4 MB) and project files.'],
+      ['Internet', 'Broadband', 'Every question uses three online services.'],
+      ['User device', 'Any phone or computer with a modern browser', 'The screen works on small and large displays.'],
+      ['Server', '1 CPU, 1 GB RAM', 'Enough for one college; the server keeps no user data.'],
+    ],
+  );
+  return [
+    H1('Chapter-3 Analysis & Design', { bm: 'ch3' }),
+    H2('3.1 Software Requirements', { bm: 'c3_1' }),
+    P('Table 3.1 lists the software we use and why. We also need three online services (Voyage AI, Pinecone and Google Gemini) with their API keys, and public access to the college website.'),
+    P('**Table 3.1: Software requirements**', { align: 'center', after: 80, keepNext: true }),
+    sw,
+    spacer(),
+    P('**Main requirements.** The system must collect and save the college text, answer questions with sources, give documents, keep chat history in the browser and report its health. It must answer within a few seconds, keep working when an online service is slow, keep secret keys on the server, and work on phones.'),
+
+    H2('3.2 Hardware Requirements', { bm: 'c3_2' }),
+    P('Query Campus needs no special hardware. The heavy work is done by online services, so ordinary computers are enough (Table 3.2).'),
+    P('**Table 3.2: Hardware requirements**', { align: 'center', after: 80, keepNext: true }),
+    hw,
+    spacer(),
+
+    H2('3.3 Analysis Diagrams', { bm: 'c3_3' }),
+    H3('3.3.1 Use Case Model'),
+    P('Fig. 3.1 shows who uses the system. The **user** (student, applicant or staff) asks questions, reads answers, gets documents and manages chats. The **operator** collects and updates the data and runs the tests. Outside systems also take part: the college website and timetable website (data), Voyage AI (numbers for text), Pinecone (database) and Gemini (answers).'),
+    ...figure(img.usecase, 'Fig. 3.1: Use case model of Query Campus', 6.3, 8.4),
+    H3('3.3.2 Use Case Description'),
+    P('Each use case is described below in the Rational format. The numbers have the form 3.3.2.n.k, where n is the use case and k is the item.'),
+    ...UCS.flatMap((uc, i) => ucDescription(uc, i)),
+
+    H2('3.4 Design Diagrams', { bm: 'c3_4' }),
+    H3('3.4.1 Architecture Diagram'),
+    H3('System overview'),
+    P('Students, applicants and staff use the chat screen. The operator runs the commands that collect and update the data. The college web team publishes the pages we read; we never change them. Voyage AI, Pinecone and Google give us numbers for text, storage and answers. In short: the question goes from the browser to the backend, the backend finds the best text and asks Gemini to write the answer, and the answer comes back with links to the college pages.'),
+    H3('Architecture strategy'),
+    bullet('**Layers.** A screen layer, an application layer, an integration layer and a separate indexing layer.'),
+    bullet('**Offline and online parts.** Slow work (collecting and indexing) is done in advance, so answering is fast.'),
+    bullet('**Two kinds of search.** Search by meaning finds the topic and keyword search finds exact names. If one fails, the other still works.'),
+    bullet('**Answers from evidence only.** Gemini sees only the found text, and the server creates the source links.'),
+    bullet('**Safe for the public.** Secret keys stay on the server, each visitor can ask 20 questions a minute, only allowed websites can call the API, and nothing about visitors is stored.'),
+    H3('Block diagram and explanation'),
+    ...figure(img.arch, 'Fig. 3.2: Architecture (block) diagram of Query Campus', 6.3, 8.4),
+    P('**Screen layer.** The chat screen shows the conversation, sends questions to the backend and saves chats in the browser.'),
+    P('**Application layer.** The backend receives questions, searches, asks Gemini and sends the answer. It also gives safe PDF downloads and a health check.'),
+    P('**Integration layer.** Small helpers that talk to Voyage AI and Pinecone and retry when a service is busy.'),
+    P('**Indexing layer.** Commands that collect the college text, cut it into chunks and save it in Pinecone.'),
+    H3('3.4.2 Sequence Diagrams'),
+    P('Fig. 3.3 shows how a question is answered. The backend checks the question, runs the two searches, merges the results and asks Gemini. The words are sent to the screen as they arrive, and at the end the sources and documents are sent.'),
+    ...figure(img.seqQuery, 'Fig. 3.3: Sequence diagram for asking a question', 6.3, 8.4),
+    P('Fig. 3.4 shows indexing. The operator first collects the pages into a file. Then the system cuts them into chunks, converts a few chunks at a time into numbers, and saves them in Pinecone.'),
+    ...figure(img.seqIngest, 'Fig. 3.4: Sequence diagram for scraping and indexing', 6.3, 8.4),
+  ];
+}
+
+module.exports = { chapter3 };

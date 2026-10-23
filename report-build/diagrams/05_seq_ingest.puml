@@ -1,0 +1,43 @@
+@startuml
+!include common.iuml
+skinparam maxMessageSize 120
+skinparam sequence {
+  ParticipantBackgroundColor #eaf1fb
+  ParticipantBorderColor #1f3b63
+  LifeLineBorderColor #8a9bb5
+}
+hide footbox
+title Sequence Diagram: Scraping and Indexing the Knowledge Base
+actor Operator
+participant "scripts" as S
+participant "Scraper\nService" as SC
+participant "College\nWebsite" as W
+participant "Ingestion\nService" as I
+participant "Embeddings\nService" as E
+participant "VectorStore\nService" as V
+database "scraped.json" as F
+
+Operator -> S : pnpm run scrape
+S -> SC : crawl()
+loop until queue empty or 600 pages
+  SC -> W : GET url
+  W --> SC : HTML or PDF
+  SC -> SC : strip chrome, extract text, collect same-origin links
+end
+SC --> S : ScrapedDocument[]
+S -> F : write JSON
+Operator -> S : pnpm run ingest
+S -> F : read documents + checkpoint
+S -> I : ingest(documents, {startIndex})
+I -> V : ensureIndex()
+V --> I : index ready (created if missing)
+I -> I : chunkDocument() for each document
+loop each batch of 5 chunks
+  I -> E : embed(texts, "document")
+  E --> I : vectors
+  I -> V : upsert(records)
+  I -> S : onBatchComplete() -> write checkpoint
+  I -> I : sleep 21 s (rate limit)
+end
+I --> S : done (checkpoint deleted)
+@enduml

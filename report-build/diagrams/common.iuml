@@ -1,0 +1,8 @@
+skinparam dpi 150
+skinparam backgroundColor white
+skinparam defaultFontName Times New Roman
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam ArrowColor #1f3b63
+skinparam ArrowFontSize 12

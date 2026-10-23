@@ -21,7 +21,9 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
-    "test:e2e": "vitest run --config ./vitest.config.e2e.ts"
+    "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
+    "timetables": "nest build && node dist/scripts/timetables.js",
+    "eval": "nest build && node dist/scripts/eval.js"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
@@ -31,6 +33,7 @@
     "@pinecone-database/pinecone": "^9.0.0",
     "axios": "^1.20.0",
     "cheerio": "^1.2.0",
+    "minisearch": "^7.2.0",
     "p-limit": "^7.3.2",
     "pdf-parse": "^2.4.5",
     "reflect-metadata": "^0.2.2",

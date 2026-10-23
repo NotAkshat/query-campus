@@ -7,3 +7,8 @@ apps/backend/data/scraped.json
 apps/backend/data/ingest-progress.json
 *.log
 .DS_Store
+*.tsbuildinfo
+apps/backend/data/keyword-chunks.json
+apps/backend/data/eval-results/
+apps/backend/data/eval-embeddings.json
+apps/backend/data/timetables.json

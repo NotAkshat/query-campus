@@ -1,0 +1,51 @@
+@startuml
+!include common.iuml
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 130
+skinparam sequence {
+  ParticipantBackgroundColor #eaf1fb
+  ParticipantBorderColor #1f3b63
+  LifeLineBorderColor #8a9bb5
+}
+hide footbox
+title Sequence Diagram: Asking a Question (Streaming)
+actor Student
+participant "Chat UI" as UI
+participant "RagController" as C
+participant "RagService" as R
+participant "Embeddings\nService" as E
+participant "VectorStore\nService" as V
+participant "KeywordSearch\nService" as K
+participant "Gemini\nAPI" as G
+
+Student -> UI : type question, press Enter
+UI -> C : POST /query/stream {question}
+C -> C : parseQuestion() - trim, validate
+alt question missing or blank
+  C --> UI : 400 "question is required"
+else valid
+  C -> R : stream(question, signal)
+  par dense retrieval
+    R -> E : embedOne(question)
+    R -> V : query(vector, 25)
+  else keyword retrieval
+    R -> K : search(question, 25)
+  end
+  R -> R : Reciprocal Rank Fusion, keep top 16
+  alt no matches
+    R --> C : delta + done("nothing relevant found")
+  else matches found
+    R -> G : stream request\n(prompt + context)
+    loop each token chunk
+      G --> R : text part
+      R --> C : delta
+      C --> UI : SSE "delta" {text}
+      UI --> Student : typewriter reveal
+    end
+    R -> R : finalize()\ncitations, ATTACH
+    R --> C : done {answer, sources, attachments}
+    C --> UI : SSE "done"
+    UI --> Student : answer, source links, document cards
+  end
+end
+@enduml

@@ -1,0 +1,66 @@
+@startuml
+!include common.iuml
+hide circle
+skinparam linetype ortho
+skinparam entity {
+  BackgroundColor #eaf1fb
+  BorderColor #1f3b63
+}
+title Entity-Relationship Diagram (Knowledge Base and Browser Chat Store)
+
+entity "ScrapedDocument\n(data/scraped.json, timetables.json)" as DOC {
+  * url : string <<PK>>
+  --
+  * title : string
+  * content : text
+  * type : enum(html, pdf)
+}
+entity "Chunk / VectorRecord\n(Pinecone index)" as CH {
+  * id : string <<PK>>  (SHA-1 of url#index)
+  --
+  * url : string <<FK>>
+  * values : float[1024]
+  * title : string
+  * text : string
+  * type : enum(html, pdf)
+}
+entity "KeywordCacheEntry\n(data/keyword-chunks.json)" as KC {
+  * id : string <<PK, FK>>
+  --
+  * metadata : ChunkMetadata
+}
+entity "Chat\n(localStorage)" as CHAT {
+  * id : uuid <<PK>>
+  --
+  * title : string
+  * updatedAt : number
+}
+entity "Message\n(localStorage)" as MSG {
+  * id : uuid <<PK>>
+  --
+  * chatId : uuid <<FK>>
+  * role : enum(user, assistant)
+  * content : text
+  error : boolean
+}
+entity "Source / Attachment\n(embedded in Message)" as SRC {
+  * messageId : uuid <<FK>>
+  * url : string <<FK>>
+  --
+  * title : string
+  * kind : enum(source, attachment)
+}
+entity "EvalCase\n(eval/cases.json)" as EC {
+  * id : string <<PK>>
+  --
+  * question : string
+  * expect : json
+}
+
+DOC ||--|{ CH : "is split into"
+CH ||--o| KC : "mirrored by"
+CHAT ||--o{ MSG : "contains"
+MSG ||--o{ SRC : "cites / attaches"
+SRC }o--|| DOC : "refers to"
+EC }o..o{ DOC : "expects retrieval of"
+@enduml

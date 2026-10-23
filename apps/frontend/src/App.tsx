@@ -1,13 +1,14 @@
-import { useRef, useState, type FormEvent } from 'react'
-import ReactMarkdown from 'react-markdown'
-import { askQuestion, type RagSource } from './api'
-
-interface Message {
-  role: 'user' | 'assistant'
-  content: string
-  sources?: RagSource[]
-  error?: boolean
-}
+import { useEffect, useRef, useState } from 'react'
+import { MotionConfig } from 'motion/react'
+import { streamQuestion } from './api'
+import { loadChats, newChat, saveChats, type Chat, type Message } from './chats'
+import { MessageBubble } from './components/MessageBubble'
+import { Avatar } from './components/Avatar'
+import { Composer } from './components/Composer'
+import { Hero } from './components/Hero'
+import { FollowUps } from './components/FollowUps'
+import { Thinking } from './components/Thinking'
+import { Sidebar } from './components/Sidebar'
 
 const SUGGESTIONS = [
   'What documents do I need for admission?',
@@ -17,140 +18,155 @@ const SUGGESTIONS = [
 ]
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [chats, setChats] = useState<Chat[]>(loadChats)
+  const [activeId, setActiveId] = useState<string | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  // Chat currently waiting for an answer, and the answer message being written (null when idle)
+  const [pendingId, setPendingId] = useState<string | null>(null)
+  const [typingId, setTypingId] = useState<string | null>(null)
   const listRef = useRef<HTMLDivElement>(null)
+
+  // Persist when idle; saving on every streamed token would serialize all chats dozens of times a second.
+  useEffect(() => {
+    if (!pendingId) saveChats(chats)
+  }, [chats, pendingId])
+
+  const active = chats.find((c) => c.id === activeId) ?? null
+  const messages = active?.messages ?? []
+  const loading = pendingId !== null
+  const lastContent = messages.at(-1)?.content
+
+  useEffect(() => {
+    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
+  }, [messages.length, lastContent])
+
+  // Updates a chat by id, so an answer lands in the right chat even if the user switched away.
+  const updateChat = (chatId: string, update: (messages: Message[]) => Message[]) =>
+    setChats((prev) =>
+      prev
+        .map((c) => (c.id === chatId ? { ...c, messages: update(c.messages), updatedAt: Date.now() } : c))
+        .sort((a, b) => b.updatedAt - a.updatedAt),
+    )
 
   const send = async (question: string) => {
     if (!question.trim() || loading) return
 
-    setMessages((prev) => [...prev, { role: 'user', content: question }])
-    setInput('')
-    setLoading(true)
+    let chatId = activeId
+    if (!chatId || !active) {
+      const chat = newChat(question.trim())
+      chatId = chat.id
+      setChats((prev) => [chat, ...prev])
+      setActiveId(chat.id)
+    }
+
+    const answerId = crypto.randomUUID()
+    const patchAnswer = (patch: Partial<Message> | ((m: Message) => Partial<Message>)) =>
+      updateChat(chatId, (msgs) =>
+        msgs.map((m) => (m.id === answerId ? { ...m, ...(typeof patch === 'function' ? patch(m) : patch) } : m)),
+      )
+
+    updateChat(chatId, (msgs) => [
+      ...msgs,
+      { id: crypto.randomUUID(), role: 'user', content: question },
+      { id: answerId, role: 'assistant', content: '' },
+    ])
+    setPendingId(chatId)
+    setTypingId(answerId)
 
     try {
-      const result = await askQuestion(question)
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: result.answer, sources: result.sources },
-      ])
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: "Couldn't reach the server. Make sure the backend is running and try again.",
-          error: true,
-        },
-      ])
+      const result = await streamQuestion(question, (text) => patchAnswer((m) => ({ content: m.content + text })))
+      patchAnswer({ content: result.answer, sources: result.sources, attachments: result.attachments })
+    } catch (err) {
+      // fetch() rejects with a TypeError on network failure; anything else carries the server's message
+      const reachable = err instanceof Error && !(err instanceof TypeError)
+      setTypingId(null)
+      patchAnswer({
+        content: reachable ? err.message : "Couldn't reach the server. Please check your connection and try again in a moment.",
+        error: true,
+      })
     } finally {
-      setLoading(false)
-      setTimeout(() => listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' }), 50)
+      setPendingId(null)
     }
   }
 
-  const onSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    send(input)
+  const selectChat = (id: string | null) => {
+    setActiveId(id)
+    setSidebarOpen(false)
   }
 
+  const deleteChat = (id: string) => {
+    setChats((prev) => prev.filter((c) => c.id !== id))
+    if (id === activeId) setActiveId(null)
+  }
+
+  const empty = messages.length === 0
+
   return (
-    <div className="flex h-svh flex-col bg-neutral-50 dark:bg-neutral-950">
-      <header className="border-b border-neutral-200 px-6 py-4 dark:border-neutral-800">
-        <h1 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">Query Campus</h1>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          Ask anything about IET DAVV — no more digging through the website.
-        </p>
-      </header>
+    <MotionConfig reducedMotion="user">
+    <div className="flex h-svh bg-page text-fg">
+      <Sidebar
+        chats={chats}
+        activeId={activeId}
+        open={sidebarOpen}
+        onSelect={selectChat}
+        onNew={() => selectChat(null)}
+        onDelete={deleteChat}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-      <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="mx-auto flex max-w-2xl flex-col gap-4">
-          {messages.length === 0 && (
-            <div className="flex flex-col gap-3">
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">Try asking:</p>
-              <div className="flex flex-wrap gap-2">
-                {SUGGESTIONS.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => send(s)}
-                    className="rounded-full border border-neutral-300 px-3 py-1.5 text-sm text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-900"
-                  >
-                    {s}
-                  </button>
-                ))}
+      <div className="relative flex min-w-0 flex-1 flex-col">
+        <header className={`flex items-center gap-3 px-4 py-3 ${empty ? 'absolute z-20 md:hidden' : 'border-b border-line bg-page/80 backdrop-blur'}`}>
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Open chat history"
+            className="rounded-full p-1.5 text-fg hover:bg-paper md:hidden"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+            </svg>
+          </button>
+          {!empty && (
+            <div className="flex min-w-0 items-center gap-3">
+              <Avatar />
+              <div className="min-w-0">
+                <h1 className="truncate font-serif text-base text-fg">{active?.title}</h1>
+                <p className="flex items-center gap-1.5 text-xs text-muted">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                  Answers from the IET DAVV website
+                </p>
               </div>
             </div>
           )}
+        </header>
 
-          {messages.map((m, i) => (
-            <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div
-                className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                  m.role === 'user'
-                    ? 'bg-neutral-900 text-neutral-50 dark:bg-neutral-100 dark:text-neutral-900'
-                    : m.error
-                      ? 'border border-red-300 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300'
-                      : 'border border-neutral-200 bg-white text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200'
-                }`}
-              >
-                {m.role === 'assistant' ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1.5 prose-ul:my-1.5">
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
-                  </div>
-                ) : (
-                  m.content
+        <div className="relative flex-1 overflow-hidden">
+          {empty ? (
+            <Hero suggestions={SUGGESTIONS} onPick={send} />
+          ) : (
+            <div ref={listRef} className="chat-bg h-full overflow-y-auto px-4 py-6">
+              <div className="mx-auto flex max-w-2xl flex-col gap-5">
+                {messages.map((m) =>
+                  m.role === 'assistant' && !m.content && pendingId === activeId ? (
+                    <Thinking key={m.id} />
+                  ) : (
+                    <MessageBubble key={m.id} message={m} typing={m.id === typingId} />
+                  ),
                 )}
-
-                {m.sources && m.sources.length > 0 && (
-                  <div className="mt-2 flex flex-col gap-1 border-t border-neutral-200 pt-2 dark:border-neutral-800">
-                    <span className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Sources</span>
-                    {m.sources.map((s) => (
-                      <a
-                        key={s.url}
-                        href={s.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="truncate text-xs text-blue-600 hover:underline dark:text-blue-400"
-                      >
-                        {s.title || s.url}
-                      </a>
-                    ))}
-                  </div>
+                {!loading && messages.at(-1)?.role === 'assistant' && !messages.at(-1)?.error && (
+                  <FollowUps asked={messages.filter((m) => m.role === 'user').map((m) => m.content)} onPick={send} />
                 )}
-              </div>
-            </div>
-          ))}
-
-          {loading && (
-            <div className="flex justify-start">
-              <div className="rounded-2xl border border-neutral-200 bg-white px-4 py-2.5 text-sm text-neutral-400 dark:border-neutral-800 dark:bg-neutral-900">
-                Thinking…
               </div>
             </div>
           )}
+        </div>
+
+        <div className="p-4">
+          <Composer disabled={loading} onSubmit={send} />
         </div>
       </div>
-
-      <form onSubmit={onSubmit} className="border-t border-neutral-200 p-4 dark:border-neutral-800">
-        <div className="mx-auto flex max-w-2xl gap-2">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about admissions, exams, fees, timetables…"
-            className="flex-1 rounded-full border border-neutral-300 bg-white px-4 py-2.5 text-sm text-neutral-900 outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
-          />
-          <button
-            type="submit"
-            disabled={loading || !input.trim()}
-            className="rounded-full bg-neutral-900 px-5 py-2.5 text-sm font-medium text-neutral-50 disabled:opacity-40 dark:bg-neutral-100 dark:text-neutral-900"
-          >
-            Send
-          </button>
-        </div>
-      </form>
     </div>
+    </MotionConfig>
   )
 }
 

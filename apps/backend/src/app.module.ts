@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller.js';
+import { DocumentsController } from './documents/documents.controller.js';
 import configuration from './config/configuration.js';
 import { ScraperModule } from './scraper/scraper.module.js';
 import { EmbeddingsModule } from './embeddings/embeddings.module.js';
@@ -17,6 +18,6 @@ import { RagModule } from './rag/rag.module.js';
     IngestionModule,
     RagModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, DocumentsController],
 })
 export class AppModule {}

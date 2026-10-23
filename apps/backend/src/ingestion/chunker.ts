@@ -11,8 +11,9 @@ export interface Chunk {
 
 const CHUNK_SIZE = 1500;
 const CHUNK_OVERLAP = 200;
+const MIN_TAIL = 40;
 
-export function chunkDocument(doc: ScrapedDocument): Chunk[] {
+export function chunkDocument(doc: ScrapedDocument, idPrefix = ''): Chunk[] {
   const chunks: Chunk[] = [];
   const text = doc.content;
 
@@ -22,8 +23,9 @@ export function chunkDocument(doc: ScrapedDocument): Chunk[] {
     const end = Math.min(start + CHUNK_SIZE, text.length);
     const slice = text.slice(start, end).trim();
 
-    if (slice.length > 0) {
-      const id = createHash('sha1').update(`${doc.url}#${index}`).digest('hex');
+    // A tiny tail is already inside the overlap of the previous chunk, so it is skipped.
+    if (slice.length > 0 && (index === 0 || slice.length >= MIN_TAIL)) {
+      const id = idPrefix + createHash('sha1').update(`${doc.url}#${index}`).digest('hex');
       chunks.push({ id, text: slice, url: doc.url, title: doc.title, type: doc.type });
       index += 1;
     }

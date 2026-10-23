@@ -1,0 +1,23 @@
+@startuml
+!include common.iuml
+skinparam ActivityBackgroundColor #eaf1fb
+skinparam ActivityBorderColor #1f3b63
+skinparam ActivityFontSize 14
+title Flow Diagram 1: Indexing Path (run by the operator)
+start
+:Operator runs **pnpm run scrape**;
+:Crawl college website\n(same origin, breadth-first, up to 600 pages);
+:Extract text from HTML pages\n(main content only) and from PDFs;
+:Save corpus to scraped.json;
+:Operator runs **pnpm run timetables**;
+:Scrape timetable portal: one document\nper class and one per faculty member;
+:Operator runs **pnpm run ingest**;
+:Split documents into 1500-character chunks\n(200 characters overlap);
+repeat
+  :Embed 5 chunks with Voyage AI (document mode);
+  :Upsert vectors + metadata into Pinecone;
+  :Write checkpoint, wait 21 s (rate limit);
+repeat while (more chunks?) is (yes) not (no)
+:Knowledge base ready (2,247 chunks);
+stop
+@enduml

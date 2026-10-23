@@ -1,0 +1,53 @@
+@startuml
+!include common.iuml
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #eaf1fb
+  BorderColor #1f3b63
+}
+left to right direction
+title Use Case Model of Query Campus
+actor "Student / Applicant\n/ Staff" as U
+actor "Operator" as O
+actor "College Website" as W <<system>>
+actor "Timetable Portal" as T <<system>>
+actor "Voyage AI" as V <<system>>
+actor "Pinecone" as P <<system>>
+actor "Google Gemini" as G <<system>>
+
+rectangle "Query Campus" {
+  usecase "UC1: Ask a Question" as UC1
+  usecase "UC2: View Streamed Answer\nwith Sources" as UC2
+  usecase "UC3: Download Requested\nDocument" as UC3
+  usecase "UC4: Manage Chat History" as UC4
+  usecase "UC5: Crawl College Website" as UC5
+  usecase "UC6: Index Content\n(Chunk, Embed, Upsert)" as UC6
+  usecase "UC7: Re-index Timetables" as UC7
+  usecase "UC8: Run Accuracy Evaluation" as UC8
+  usecase "UC9: Check Service Health" as UC9
+  usecase "Retrieve Relevant Chunks" as R
+  usecase "Generate Grounded Answer" as GEN
+}
+U --> UC1
+U --> UC2
+U --> UC3
+U --> UC4
+O --> UC5
+O --> UC6
+O --> UC7
+O --> UC8
+O --> UC9
+UC1 ..> R : <<include>>
+UC1 ..> GEN : <<include>>
+UC2 ..> UC1 : <<extend>>
+UC3 ..> UC1 : <<extend>>
+UC8 ..> R : <<include>>
+UC8 ..> GEN : <<include>>
+UC5 --> W
+UC7 --> T
+UC6 --> V
+UC6 --> P
+R --> V
+R --> P
+GEN --> G
+@enduml

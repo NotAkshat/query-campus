@@ -1,0 +1,33 @@
+@startuml
+!include common.iuml
+skinparam ActivityBackgroundColor #eaf1fb
+skinparam ActivityBorderColor #1f3b63
+skinparam ActivityFontSize 14
+title Flow Diagram 2: Query Path (run for every question)
+start
+:Student types a question in the chat UI;
+:UI sends POST /query/stream;
+if (Question non-empty text?) then (no)
+  :Return HTTP 400 "question is required";
+  stop
+else (yes)
+endif
+fork
+  :Embed question (Voyage AI, query mode);
+  :Dense search in Pinecone (top 25);
+fork again
+  :BM25 keyword search (top 25);
+end fork
+:Merge both lists with Reciprocal Rank Fusion;
+:Keep best 16 chunks as context;
+if (Any chunk found?) then (no)
+  :Reply "nothing relevant found";
+else (yes)
+  :Send grounded prompt + context to Gemini\n(fall back to next model on failure);
+  :Stream answer tokens to the browser (SSE);
+  :Convert citations [n] to source links,\nextract ATTACH documents;
+endif
+:UI shows answer, sources and document cards;
+:Chat saved in browser localStorage;
+stop
+@enduml
