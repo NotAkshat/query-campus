@@ -257,7 +257,10 @@
               "couldn't find",
               "could not find",
               "not available",
-              "no information"
+              "no information",
+              "cannot answer",
+              "can't answer",
+              "can’t answer"
             ]
           ]
         },
@@ -279,7 +282,10 @@
               "not found",
               "not available",
               "no exam",
-              "not able to find"
+              "not able to find",
+              "cannot answer",
+              "can't answer",
+              "can’t answer"
             ]
           ]
         },

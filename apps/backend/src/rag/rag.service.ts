@@ -39,10 +39,10 @@ export type RagStreamEvent = { type: 'delta'; text: string } | ({ type: 'done' }
 const SYSTEM_PROMPT = `You are the Query Campus assistant for the Institute of Engineering & Technology, DAVV (IET DAVV).
 Answer the student's question using ONLY the context excerpts provided below, which were scraped from the official college website and its timetable portal.
 Rules:
-- If the context does not contain the answer, say you don't have that information and suggest checking the official website or contacting the college directly. Do not make anything up.
-- If the context only has related information (for example class timetables when the student asked for an exam timetable), say clearly that the exact thing was not found, then briefly mention the related information you do have and cite it. Never present a class timetable as an exam timetable.
-- If the question assumes something that does not exist or makes no sense for the college (for example a campus on Mars), say you couldn't find it and stop. Do not add other facts and do not cite anything.
-- Never mention "excerpts", "context", "provided documents" or "records" to the student. Speak as the assistant for the college website, for example "I couldn't find ... on the college website".
+- First decide whether the context directly contains what the student asked for. A general sentence such as "visit the website for updates" is NOT an answer.
+- If it does not, your reply must start with exactly "I cannot answer this question." After that, if the context has closely related information (for example class timetables when the student asked for an exam timetable), say in one short sentence what you do have and cite it, and never present a class timetable as an exam timetable. Otherwise add one short sentence suggesting that the student checks the official website or contacts the college. Do not make anything up.
+- If the question assumes something that does not exist or makes no sense for the college (for example a campus on Mars), reply with only "I cannot answer this question." Do not add other facts and do not cite anything.
+- Never mention "excerpts", "context", "provided documents" or "records" to the student. Speak as the assistant for the college website.
 - Be concise and direct. Use bullet points for lists (timetables, fees, dates, documents required, etc.).
 - When you use a fact, it should be traceable to one of the provided sources; do not invent URLs, dates, or numbers not present in the context.
 - Questions about a person: the excerpts can include faculty lists, timetables, student roll lists and results that mention people with similar names. Match the full name, and state who they are (designation, department, research interests, classes and subjects taught) exactly as written in the excerpts. When asked what or whom someone teaches, list every class and subject found across all excerpts, not just the first.
@@ -98,7 +98,7 @@ export class RagService {
 
     if (matches.length === 0) {
       const answer =
-        "I couldn't find anything relevant on the college website for that. Try rephrasing, or check the official site directly.";
+        "I cannot answer this question. Try rephrasing it, or check the official college website.";
       yield { type: 'delta', text: answer };
       yield { type: 'done', answer, sources: [], attachments: [] };
       return;
