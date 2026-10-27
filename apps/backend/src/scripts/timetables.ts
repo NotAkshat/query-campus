@@ -6,12 +6,13 @@ import { AppModule } from '../app.module.js';
 import { TimetableScraperService } from '../scraper/timetable.scraper.js';
 import { IngestionService } from '../ingestion/ingestion.service.js';
 import { VectorStoreService } from '../vectorstore/vectorstore.service.js';
+import { chunkDocument } from '../ingestion/chunker.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ID_PREFIX = 'tt:';
 
 /**
- * Re-indexes the current class timetables from timetable.ietonline.in. Replaces only this source's
+ * Re-indexes the current class timetables from the timetable portal. Replaces only this source's
  * chunks (ids prefixed "tt:"); the rest of the index is untouched. Pass --dry-run to just scrape.
  */
 async function main() {
@@ -24,10 +25,15 @@ async function main() {
   console.log(`Scraped ${documents.length} timetable documents -> ${outPath}`);
 
   if (!process.argv.includes('--dry-run')) {
-    const removed = await app.get(VectorStoreService).deleteByPrefix(ID_PREFIX);
-    console.log(`Removed ${removed} previous timetable chunks`);
-    await app.get(IngestionService).ingest(documents, { idPrefix: ID_PREFIX });
-    console.log('Timetables indexed. Restart the backend (or delete data/keyword-chunks.json) to refresh keyword search.');
+    // Add the new chunks first and remove the old ones afterwards, so the live site never loses its
+    // timetables while this runs (it can take a while on the free embedding plan).
+    const keep = new Set(documents.flatMap((d) => chunkDocument(d, ID_PREFIX).map((c) => c.id)));
+    await app.get(IngestionService).ingest(documents, { idPrefix: ID_PREFIX, skipExisting: true });
+    const vectorStore = app.get(VectorStoreService);
+    const stale = (await vectorStore.listIds(ID_PREFIX)).filter((id) => !keep.has(id));
+    const removed = await vectorStore.deleteIds(stale);
+    console.log(`Removed ${removed} old timetable chunks`);
+    console.log('Timetables indexed. The running backend picks them up within ten minutes (or after a restart).');
   }
 
   await app.close();

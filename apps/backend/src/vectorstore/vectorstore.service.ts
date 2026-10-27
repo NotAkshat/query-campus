@@ -99,6 +99,14 @@ export class VectorStoreService {
     return out;
   }
 
+  /** Deletes the records with exactly these ids, in groups of 1,000. Returns how many were removed. */
+  async deleteIds(ids: string[]): Promise<number> {
+    for (let i = 0; i < ids.length; i += 1000) {
+      await this.index.deleteMany({ ids: ids.slice(i, i + 1000) });
+    }
+    return ids.length;
+  }
+
   /** Deletes every record whose id starts with `prefix`. Returns how many were removed. */
   async deleteByPrefix(prefix: string): Promise<number> {
     // Collect all ids first; deleting while paginating would shift the pages.

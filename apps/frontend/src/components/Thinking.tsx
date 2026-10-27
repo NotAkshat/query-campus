@@ -3,14 +3,23 @@ import { AnimatePresence, motion } from 'motion/react'
 import { Avatar } from './Avatar'
 
 const STEPS = ['Searching the college website…', 'Reading the best matches…', 'Writing your answer…']
+// Shown if nothing has arrived after a while: the free server may have been asleep and is waking up.
+const SLOW_MESSAGE = 'Still working. The server may be waking up, this can take up to a minute…'
+const SLOW_AFTER_MS = 9_000
 
 /** Shown while the assistant has not started writing: status text changes and a shimmer runs under it. */
 export function Thinking() {
   const [i, setI] = useState(0)
+  const [slow, setSlow] = useState(false)
   useEffect(() => {
     const t = setInterval(() => setI((n) => Math.min(n + 1, STEPS.length - 1)), 1600)
-    return () => clearInterval(t)
+    const slowTimer = setTimeout(() => setSlow(true), SLOW_AFTER_MS)
+    return () => {
+      clearInterval(t)
+      clearTimeout(slowTimer)
+    }
   }, [])
+  const text = slow ? SLOW_MESSAGE : STEPS[i]
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -22,14 +31,14 @@ export function Thinking() {
       <div className="relative overflow-hidden rounded-3xl bg-paper px-5 py-3 text-sm text-muted">
         <AnimatePresence mode="wait">
           <motion.span
-            key={i}
+            key={text}
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.2 }}
             className="block"
           >
-            {STEPS[i]}
+            {text}
           </motion.span>
         </AnimatePresence>
         <motion.span

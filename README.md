@@ -48,7 +48,7 @@ pnpm run ingest   # chunks + embeds + upserts into Pinecone
 
 Re-run both whenever the college website content changes. To save time and quota, add `--incremental` to `ingest`: it embeds only pages that are new since the last run (an existing page that was edited keeps its old text; run a plain `pnpm run ingest` to refresh everything).
 
-Current class timetables live on a separate portal (timetable.ietonline.in). Re-index them each semester:
+Current class timetables live on a separate portal (timetable.ietdavv.edu.in). Re-index them each semester:
 
 ```bash
 pnpm run timetables   # scrapes the portal and replaces only the timetable chunks

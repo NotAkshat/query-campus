@@ -4,7 +4,8 @@ import * as cheerio from 'cheerio';
 import { ScrapedDocument } from './types.js';
 
 const USER_AGENT = 'QueryCampusBot/0.1 (+https://github.com/query-campus; educational RAG project)';
-export const TIMETABLE_SITE = 'https://timetable.ietonline.in';
+// The college moved its timetable portal from timetable.ietonline.in to this address (October 2026).
+export const TIMETABLE_SITE = 'https://timetable.ietdavv.edu.in';
 
 interface Slot {
   day: string;
@@ -31,7 +32,7 @@ interface ClassTimetable {
 }
 
 /**
- * Current class timetables live on a separate public site (timetable.ietonline.in, linked from the
+ * Current class timetables live on a separate public site (timetable.ietdavv.edu.in, linked from the
  * college homepage), not as PDFs on the main site. Its filter form is a plain GET, so each program's
  * timetables can be fetched and parsed into one document per class plus one per faculty member.
  */
