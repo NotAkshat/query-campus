@@ -1,312 +1,431 @@
-[
- {
-  "id": "ch1",
-  "label": "Chapter-1 Introduction",
-  "level": 1
- },
- {
-  "id": "c1_1",
-  "label": "1.1 Overview and Issues Involved",
-  "level": 2
- },
- {
-  "id": "c1_2",
-  "label": "1.2 Problem Definition",
-  "level": 2
- },
- {
-  "id": "c1_3",
-  "label": "1.3 Proposed Solution",
-  "level": 2
- },
- {
-  "id": "ch2",
-  "label": "Chapter-2 Literature Survey",
-  "level": 1
- },
- {
-  "id": "c2_1",
-  "label": "2.1 Existing Solutions",
-  "level": 2
- },
- {
-  "id": "c2_2",
-  "label": "2.2 Methodology",
-  "level": 2
- },
- {
-  "id": "h_1",
-  "label": "2.2.1 Steps followed",
-  "level": 3
- },
- {
-  "id": "h_2",
-  "label": "2.2.2 Concepts needed to understand the project",
-  "level": 3
- },
- {
-  "id": "ch3",
-  "label": "Chapter-3 Analysis & Design",
-  "level": 1
- },
- {
-  "id": "c3_1",
-  "label": "3.1 Software Requirements",
-  "level": 2
- },
- {
-  "id": "c3_2",
-  "label": "3.2 Hardware Requirements",
-  "level": 2
- },
- {
-  "id": "c3_3",
-  "label": "3.3 Analysis Diagrams",
-  "level": 2
- },
- {
-  "id": "h_3",
-  "label": "3.3.1 Use Case Model",
-  "level": 3
- },
- {
-  "id": "h_4",
-  "label": "3.3.2 Use Case Description",
-  "level": 3
- },
- {
-  "id": "h_5",
-  "label": "3.3.2.1 UC1: Ask a Question",
-  "level": 3
- },
- {
-  "id": "h_6",
-  "label": "3.3.2.2 UC2: View Streamed Answer with Sources",
-  "level": 3
- },
- {
-  "id": "h_7",
-  "label": "3.3.2.3 UC3: Download Requested Document",
-  "level": 3
- },
- {
-  "id": "h_8",
-  "label": "3.3.2.4 UC4: Manage Chat History",
-  "level": 3
- },
- {
-  "id": "h_9",
-  "label": "3.3.2.5 UC5: Crawl College Website",
-  "level": 3
- },
- {
-  "id": "h_10",
-  "label": "3.3.2.6 UC6: Index Content",
-  "level": 3
- },
- {
-  "id": "h_11",
-  "label": "3.3.2.7 UC7: Re-index Timetables",
-  "level": 3
- },
- {
-  "id": "h_12",
-  "label": "3.3.2.8 UC8: Run Accuracy Test",
-  "level": 3
- },
- {
-  "id": "h_13",
-  "label": "3.3.2.9 UC9: Check Service Health",
-  "level": 3
- },
- {
-  "id": "h_14",
-  "label": "3.3.2.10 UC10: Retrieve Relevant Chunks (included)",
-  "level": 3
- },
- {
-  "id": "h_15",
-  "label": "3.3.2.11 UC11: Generate Grounded Answer (included)",
-  "level": 3
- },
- {
-  "id": "c3_4",
-  "label": "3.4 Design Diagrams",
-  "level": 2
- },
- {
-  "id": "h_16",
-  "label": "3.4.1 Architecture Diagram",
-  "level": 3
- },
- {
-  "id": "h_17",
-  "label": "System overview",
-  "level": 3
- },
- {
-  "id": "h_18",
-  "label": "Architecture strategy",
-  "level": 3
- },
- {
-  "id": "h_19",
-  "label": "Block diagram and explanation",
-  "level": 3
- },
- {
-  "id": "h_20",
-  "label": "3.4.2 Sequence Diagrams",
-  "level": 3
- },
- {
-  "id": "ch4",
-  "label": "Chapter-4 Implementation and Testing",
-  "level": 1
- },
- {
-  "id": "c4_1",
-  "label": "4.1 Database Design",
-  "level": 2
- },
- {
-  "id": "c4_2",
-  "label": "4.2 Class Diagram",
-  "level": 2
- },
- {
-  "id": "h_21",
-  "label": "Explanation of the classes",
-  "level": 2
- },
- {
-  "id": "h_22",
-  "label": "4.2.1 RagController",
-  "level": 3
- },
- {
-  "id": "h_23",
-  "label": "4.2.2 DocumentsController",
-  "level": 3
- },
- {
-  "id": "h_24",
-  "label": "4.2.3 AppController",
-  "level": 3
- },
- {
-  "id": "h_25",
-  "label": "4.2.4 RagService",
-  "level": 3
- },
- {
-  "id": "h_26",
-  "label": "4.2.5 KeywordSearchService",
-  "level": 3
- },
- {
-  "id": "h_27",
-  "label": "4.2.6 EmbeddingsService",
-  "level": 3
- },
- {
-  "id": "h_28",
-  "label": "4.2.7 VectorStoreService",
-  "level": 3
- },
- {
-  "id": "h_29",
-  "label": "4.2.8 IngestionService",
-  "level": 3
- },
- {
-  "id": "h_30",
-  "label": "4.2.9 ScraperService",
-  "level": 3
- },
- {
-  "id": "h_31",
-  "label": "4.2.10 TimetableScraperService",
-  "level": 3
- },
- {
-  "id": "h_32",
-  "label": "4.2.11 Helper functions",
-  "level": 3
- },
- {
-  "id": "c4_3",
-  "label": "4.3 Test Cases",
-  "level": 2
- },
- {
-  "id": "h_33",
-  "label": "4.3.1 Testing techniques used",
-  "level": 3
- },
- {
-  "id": "h_34",
-  "label": "4.3.2 Screen snapshots and test cases",
-  "level": 3
- },
- {
-  "id": "h_35",
-  "label": "4.3.3 Accuracy test results",
-  "level": 3
- },
- {
-  "id": "h_36",
-  "label": "4.3.4 Improvements made after testing",
-  "level": 3
- },
- {
-  "id": "ch5",
-  "label": "Chapter-5 Conclusion",
-  "level": 1
- },
- {
-  "id": "refs",
-  "label": "REFERENCES",
-  "level": 1
- },
- {
-  "id": "appx",
-  "label": "APPENDIX",
-  "level": 1
- },
- {
-  "id": "h_37",
-  "label": "A. Abbreviation List",
-  "level": 2
- },
- {
-  "id": "h_38",
-  "label": "B. Glossary",
-  "level": 2
- },
- {
-  "id": "h_39",
-  "label": "C. User Manual",
-  "level": 2
- },
- {
-  "id": "h_40",
-  "label": "C.1 For students, applicants and staff",
-  "level": 3
- },
- {
-  "id": "h_41",
-  "label": "C.2 For the operator",
-  "level": 3
- },
- {
-  "id": "h_42",
-  "label": "D. Main Settings",
-  "level": 2
- },
- {
-  "id": "h_43",
-  "label": "E. Deployment",
-  "level": 2
- }
-]
+{
+ "bookmarks": [
+  {
+   "id": "ch1",
+   "label": "Chapter-1 Introduction",
+   "level": 1
+  },
+  {
+   "id": "c1_1",
+   "label": "1.1 Overview and Issues Involved",
+   "level": 2
+  },
+  {
+   "id": "c1_2",
+   "label": "1.2 Problem Definition",
+   "level": 2
+  },
+  {
+   "id": "c1_3",
+   "label": "1.3 Proposed Solution",
+   "level": 2
+  },
+  {
+   "id": "ch2",
+   "label": "Chapter-2 Literature Survey",
+   "level": 1
+  },
+  {
+   "id": "c2_1",
+   "label": "2.1 Existing Solutions",
+   "level": 2
+  },
+  {
+   "id": "c2_2",
+   "label": "2.2 Methodology",
+   "level": 2
+  },
+  {
+   "id": "h_1",
+   "label": "2.2.1 Steps followed",
+   "level": 3
+  },
+  {
+   "id": "h_2",
+   "label": "2.2.2 Concepts needed to understand the project",
+   "level": 3
+  },
+  {
+   "id": "ch3",
+   "label": "Chapter-3 Analysis & Design",
+   "level": 1
+  },
+  {
+   "id": "c3_1",
+   "label": "3.1 Software Requirements",
+   "level": 2
+  },
+  {
+   "id": "c3_2",
+   "label": "3.2 Hardware Requirements",
+   "level": 2
+  },
+  {
+   "id": "c3_3",
+   "label": "3.3 Analysis Diagrams",
+   "level": 2
+  },
+  {
+   "id": "h_3",
+   "label": "3.3.1 Use Case Model",
+   "level": 3
+  },
+  {
+   "id": "h_4",
+   "label": "3.3.2 Use Case Description",
+   "level": 3
+  },
+  {
+   "id": "h_5",
+   "label": "3.3.2.1 UC1: Ask a Question",
+   "level": 3
+  },
+  {
+   "id": "h_6",
+   "label": "3.3.2.2 UC2: View Streamed Answer with Sources",
+   "level": 3
+  },
+  {
+   "id": "h_7",
+   "label": "3.3.2.3 UC3: Download Requested Document",
+   "level": 3
+  },
+  {
+   "id": "h_8",
+   "label": "3.3.2.4 UC4: Manage Chat History",
+   "level": 3
+  },
+  {
+   "id": "h_9",
+   "label": "3.3.2.5 UC5: Crawl College Website",
+   "level": 3
+  },
+  {
+   "id": "h_10",
+   "label": "3.3.2.6 UC6: Index Content",
+   "level": 3
+  },
+  {
+   "id": "h_11",
+   "label": "3.3.2.7 UC7: Re-index Timetables",
+   "level": 3
+  },
+  {
+   "id": "h_12",
+   "label": "3.3.2.8 UC8: Run Accuracy Test",
+   "level": 3
+  },
+  {
+   "id": "h_13",
+   "label": "3.3.2.9 UC9: Check Service Health",
+   "level": 3
+  },
+  {
+   "id": "h_14",
+   "label": "3.3.2.10 UC10: Retrieve Relevant Chunks (included)",
+   "level": 3
+  },
+  {
+   "id": "h_15",
+   "label": "3.3.2.11 UC11: Generate Grounded Answer (included)",
+   "level": 3
+  },
+  {
+   "id": "c3_4",
+   "label": "3.4 Design Diagrams",
+   "level": 2
+  },
+  {
+   "id": "h_16",
+   "label": "3.4.1 Architecture Diagram",
+   "level": 3
+  },
+  {
+   "id": "h_17",
+   "label": "System overview",
+   "level": 3
+  },
+  {
+   "id": "h_18",
+   "label": "Architecture strategy",
+   "level": 3
+  },
+  {
+   "id": "h_19",
+   "label": "Block diagram and explanation",
+   "level": 3
+  },
+  {
+   "id": "h_20",
+   "label": "3.4.2 Sequence Diagrams",
+   "level": 3
+  },
+  {
+   "id": "ch4",
+   "label": "Chapter-4 Implementation and Testing",
+   "level": 1
+  },
+  {
+   "id": "c4_1",
+   "label": "4.1 Database Design",
+   "level": 2
+  },
+  {
+   "id": "c4_2",
+   "label": "4.2 Class Diagram",
+   "level": 2
+  },
+  {
+   "id": "h_21",
+   "label": "Explanation of the classes",
+   "level": 2
+  },
+  {
+   "id": "h_22",
+   "label": "4.2.1 RagController",
+   "level": 3
+  },
+  {
+   "id": "h_23",
+   "label": "4.2.2 DocumentsController",
+   "level": 3
+  },
+  {
+   "id": "h_24",
+   "label": "4.2.3 AppController",
+   "level": 3
+  },
+  {
+   "id": "h_25",
+   "label": "4.2.4 RagService",
+   "level": 3
+  },
+  {
+   "id": "h_26",
+   "label": "4.2.5 KeywordSearchService",
+   "level": 3
+  },
+  {
+   "id": "h_27",
+   "label": "4.2.6 EmbeddingsService",
+   "level": 3
+  },
+  {
+   "id": "h_28",
+   "label": "4.2.7 VectorStoreService",
+   "level": 3
+  },
+  {
+   "id": "h_29",
+   "label": "4.2.8 IngestionService",
+   "level": 3
+  },
+  {
+   "id": "h_30",
+   "label": "4.2.9 ScraperService",
+   "level": 3
+  },
+  {
+   "id": "h_31",
+   "label": "4.2.10 TimetableScraperService",
+   "level": 3
+  },
+  {
+   "id": "h_32",
+   "label": "4.2.11 Helper functions",
+   "level": 3
+  },
+  {
+   "id": "c4_3",
+   "label": "4.3 Test Cases",
+   "level": 2
+  },
+  {
+   "id": "h_33",
+   "label": "4.3.1 Testing techniques used",
+   "level": 3
+  },
+  {
+   "id": "h_34",
+   "label": "4.3.2 Screen snapshots and test cases",
+   "level": 3
+  },
+  {
+   "id": "h_35",
+   "label": "4.3.3 Accuracy test results",
+   "level": 3
+  },
+  {
+   "id": "h_36",
+   "label": "4.3.4 Improvements made after testing",
+   "level": 3
+  },
+  {
+   "id": "ch5",
+   "label": "Chapter-5 Conclusion",
+   "level": 1
+  },
+  {
+   "id": "refs",
+   "label": "REFERENCES",
+   "level": 1
+  },
+  {
+   "id": "appx",
+   "label": "APPENDIX",
+   "level": 1
+  },
+  {
+   "id": "h_37",
+   "label": "A. Abbreviation List",
+   "level": 2
+  },
+  {
+   "id": "h_38",
+   "label": "B. Glossary",
+   "level": 2
+  },
+  {
+   "id": "h_39",
+   "label": "C. User Manual",
+   "level": 2
+  },
+  {
+   "id": "h_40",
+   "label": "C.1 For students, applicants and staff",
+   "level": 3
+  },
+  {
+   "id": "h_41",
+   "label": "C.2 For the operator",
+   "level": 3
+  },
+  {
+   "id": "h_42",
+   "label": "D. Main Settings",
+   "level": 2
+  },
+  {
+   "id": "h_43",
+   "label": "E. Deployment",
+   "level": 2
+  }
+ ],
+ "captions": [
+  {
+   "id": "cap_fig_1_1",
+   "kind": "Figure",
+   "label": "Fig. 1.1: Flow diagrams (indexing and answering)"
+  },
+  {
+   "id": "cap_tbl_2_1",
+   "kind": "Table",
+   "label": "Table 2.1: Comparison of existing solutions with Query Campus"
+  },
+  {
+   "id": "cap_tbl_3_1",
+   "kind": "Table",
+   "label": "Table 3.1: Software requirements"
+  },
+  {
+   "id": "cap_tbl_3_2",
+   "kind": "Table",
+   "label": "Table 3.2: Hardware requirements"
+  },
+  {
+   "id": "cap_fig_3_1",
+   "kind": "Figure",
+   "label": "Fig. 3.1: Use case model of Query Campus"
+  },
+  {
+   "id": "cap_fig_3_2",
+   "kind": "Figure",
+   "label": "Fig. 3.2: Architecture (block) diagram of Query Campus"
+  },
+  {
+   "id": "cap_fig_3_3",
+   "kind": "Figure",
+   "label": "Fig. 3.3: Sequence diagram for asking a question"
+  },
+  {
+   "id": "cap_fig_3_4",
+   "kind": "Figure",
+   "label": "Fig. 3.4: Sequence diagram for scraping and indexing"
+  },
+  {
+   "id": "cap_fig_4_1",
+   "kind": "Figure",
+   "label": "Fig. 4.1: Entity-relationship diagram of Query Campus"
+  },
+  {
+   "id": "cap_tbl_4_1",
+   "kind": "Table",
+   "label": "Table 4.1: ScrapedDocument (scraped.json and timetables.json)"
+  },
+  {
+   "id": "cap_tbl_4_2",
+   "kind": "Table",
+   "label": "Table 4.2: Chunk (Pinecone index “query-campus”)"
+  },
+  {
+   "id": "cap_tbl_4_3",
+   "kind": "Table",
+   "label": "Table 4.3: KeywordCacheEntry (keyword-chunks.json)"
+  },
+  {
+   "id": "cap_tbl_4_4",
+   "kind": "Table",
+   "label": "Table 4.4: Chat (browser localStorage)"
+  },
+  {
+   "id": "cap_tbl_4_5",
+   "kind": "Table",
+   "label": "Table 4.5: Message (stored inside a Chat)"
+  },
+  {
+   "id": "cap_tbl_4_6",
+   "kind": "Table",
+   "label": "Table 4.6: EvalCase (eval/cases.json)"
+  },
+  {
+   "id": "cap_fig_4_2",
+   "kind": "Figure",
+   "label": "Fig. 4.2: Class diagram (1 of 2): query service classes"
+  },
+  {
+   "id": "cap_fig_4_3",
+   "kind": "Figure",
+   "label": "Fig. 4.3: Class diagram (2 of 2): indexing classes and data types"
+  },
+  {
+   "id": "cap_fig_4_4",
+   "kind": "Figure",
+   "label": "Fig. 4.4: Home screen of Query Campus"
+  },
+  {
+   "id": "cap_fig_4_5",
+   "kind": "Figure",
+   "label": "Fig. 4.5: Answer with a source link"
+  },
+  {
+   "id": "cap_fig_4_6",
+   "kind": "Figure",
+   "label": "Fig. 4.6: Answer with a document card"
+  },
+  {
+   "id": "cap_fig_4_7",
+   "kind": "Figure",
+   "label": "Fig. 4.7: Reply when the information is not available"
+  },
+  {
+   "id": "cap_tbl_4_7",
+   "kind": "Table",
+   "label": "Table 4.7: Accuracy test of 19 questions (23 October 2026)"
+  },
+  {
+   "id": "cap_tbl_5_1",
+   "kind": "Table",
+   "label": "Table 5.1: Key results"
+  }
+ ]
+}

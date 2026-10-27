@@ -106,12 +106,38 @@ function table(widths, header, rows, o = {}) {
 
 const spacer = (after = PARA_GAP) => new Paragraph({ spacing: { after, line: 240 }, children: [] });
 
-const caption = (text) =>
-  new Paragraph({
+// Captions are registered so the front pages can list them with page numbers.
+const captions = []; // {id, kind: 'Table' | 'Figure', label}
+function captionBookmark(text) {
+  const plain = text.replace(/\*\*/g, '');
+  const m = plain.match(/^(Fig\.|Table)\s+([\d.]+):/);
+  if (!m) return null;
+  const id = `cap_${m[1] === 'Table' ? 'tbl' : 'fig'}_${m[2].replace(/\./g, '_')}`;
+  captions.push({ id, kind: m[1] === 'Table' ? 'Table' : 'Figure', label: plain });
+  return { id, plain };
+}
+
+const caption = (text) => {
+  const bm = captionBookmark(text);
+  const runs_ = runs(text, { bold: true });
+  return new Paragraph({
     alignment: AlignmentType.CENTER,
     spacing: { line: LINE_15, before: 80, after: PARA_GAP },
-    children: runs(text, { bold: true }),
+    children: bm ? [new Bookmark({ id: bm.id, children: runs_ })] : runs_,
   });
+};
+
+/** Centered bold caption above a table, registered for the list of tables. */
+const tcap = (text) => {
+  const bm = captionBookmark(text);
+  const runs_ = runs(text, { bold: true });
+  return new Paragraph({
+    alignment: AlignmentType.CENTER,
+    keepNext: true,
+    spacing: { line: LINE_15, after: 80 },
+    children: bm ? [new Bookmark({ id: bm.id, children: runs_ })] : runs_,
+  });
+};
 
 /** Reads PNG dimensions from the IHDR chunk. */
 function pngSize(path) {
@@ -219,7 +245,7 @@ function twoFigures(p1, p2, heightIn, text) {
   return [new TB({ width: { size: 9026, type: WidthType.DXA }, columnWidths: [4513, 4513], rows: [new TR({ cantSplit: true, children: [cell(p1), cell(p2)] })] }), caption(text)];
 }
 
-module.exports = { LAND, twoFigures,
+module.exports = { LAND, twoFigures, tcap, captions,
   FONT, PT, P, bullet, numbered, H1, H2, H3, table, spacer, caption, figure, screenshot, FP, FH, tocRow,
   numberingConfig, bookmarks, runs, CONTENT_W, LINE_15, PARA_GAP,
 };

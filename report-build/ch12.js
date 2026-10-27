@@ -1,4 +1,4 @@
-const { P, bullet, numbered, H1, H2, H3, table, twoFigures } = require('./lib');
+const { P, bullet, numbered, H1, H2, H3, table, twoFigures, tcap } = require('./lib');
 
 function chapter1(img) {
   return [
@@ -24,7 +24,7 @@ function chapter1(img) {
 
     H2('1.3 Proposed Solution', { bm: 'c1_3' }),
     P('Query Campus is a chat assistant for IET DAVV. It works in two parts, shown in Fig. 1.1. In the **indexing part**, the operator collects the pages, cuts them into small chunks and saves them in a database. In the **answering part**, the system searches the database for the best chunks, sends them to Gemini, and shows the answer to the student with its sources.'),
-    ...twoFigures(img.flowA, img.flowB, 5.7, 'Fig. 1.1: Flow diagrams of Query Campus (left: indexing, right: answering)'),
+    ...twoFigures(img.flowA, img.flowB, 5.7, 'Fig. 1.1: Flow diagrams (indexing and answering)'),
     P('**Functions of the project:**', { after: 120 }),
     bullet('Collects text from the college website (web pages and PDFs) and from the timetable website.'),
     bullet('Saves the text as small chunks in a Pinecone database.'),
@@ -32,7 +32,7 @@ function chapter1(img) {
     bullet('Writes the answer with Gemini, with sources, and says so when it cannot find the answer.'),
     bullet('Shows the answer in a chat screen with saved chats, source links and document cards.'),
     bullet('Works safely for the public: a limit on questions per visitor and a limit on question length.'),
-    bullet('Has a test tool with 18 questions to check the accuracy.'),
+    bullet('Has a test tool with 19 questions to check the accuracy.'),
     P('**Why it is better than existing solutions.** The college website search cannot understand questions. FAQ chatbots only answer fixed questions. General chatbots make up facts. Paid college chatbots are closed and are not made for IET DAVV. Query Campus answers only from the college pages, shows its sources, reads the timetable website too, says “I could not find it” instead of guessing, and is easy to update.'),
   ];
 }
@@ -62,7 +62,7 @@ function chapter2(img) {
     P('**(d) ChatPDF.** ChatPDF [2] answers questions about one uploaded PDF. The college has more than 600 PDFs, so a student would have to find and upload the right one.'),
     P('**(e) Paid college chatbots.** Ivy.ai [3], Ocelot [4], Element451 BoltBot [5] and Gravyty [6] sell chatbots to universities. They work well, but they are closed, paid products that are set up by the company.'),
     P('**(f) General chatbots and FAQ bots.** ChatGPT and Gemini have not read the current college notices and may give wrong answers. FAQ bots only reply to a fixed list of questions.'),
-    P('**Table 2.1: Comparison of existing solutions with Query Campus**', { align: 'center', after: 80, keepNext: true }),
+    tcap('Table 2.1: Comparison of existing solutions with Query Campus'),
     t1,
     P('**Gap.** No existing solution gives a direct answer that comes only from the official IET DAVV website and timetable website, shows its source, and can be updated cheaply. Query Campus fills this gap.', { before: 240 }),
 
@@ -73,7 +73,7 @@ function chapter2(img) {
     numbered('**Index.** We cut the text into chunks, converted them into numbers and saved them in a database.', 'steps2'),
     numbered('**Answer.** We built the search, the Gemini prompt and the streaming answer.', 'steps2'),
     numbered('**Chat screen.** We built the React chat screen with sources, saved chats and document cards.', 'steps2'),
-    numbered('**Test and improve.** We tested with 18 real questions and fixed the problems we found.', 'steps2'),
+    numbered('**Test and improve.** We tested with 19 real questions and fixed the problems we found.', 'steps2'),
     H3('2.2.2 Concepts needed to understand the project'),
     P('**Crawler.** A program that opens a web page, collects its links and repeats this for every new link. Ours stays on the college website.'),
     P('**Chunk.** A small piece of a document (about 1,500 characters). Small pieces are easier to search than a whole document.'),

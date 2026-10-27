@@ -82,6 +82,6 @@ const doc = new Document({
 
 Packer.toBuffer(doc).then((b) => {
   fs.writeFileSync('Query_Campus_Project_Report.docx', b);
-  fs.writeFileSync('headings.json', JSON.stringify(L.bookmarks, null, 1));
+  fs.writeFileSync('headings.json', JSON.stringify({ bookmarks: L.bookmarks, captions: L.captions }, null, 1));
   console.log('written', b.length);
 });

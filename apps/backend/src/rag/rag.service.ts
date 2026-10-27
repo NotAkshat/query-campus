@@ -7,6 +7,7 @@ import { ChunkMetadata, VectorStoreService } from '../vectorstore/vectorstore.se
 import { withRetry } from '../common/retry.js';
 import { KeywordSearchService } from './keyword-search.service.js';
 import { limitPerKey } from '../common/text.js';
+import { unsafeReply } from './safety.js';
 
 // Candidates pulled from each retriever, and how many fused chunks go to the model.
 const CANDIDATES_PER_RETRIEVER = 25;
@@ -41,6 +42,8 @@ Answer the student's question using ONLY the context excerpts provided below, wh
 Rules:
 - First decide whether the context directly contains what the student asked for. A general sentence such as "visit the website for updates" is NOT an answer.
 - If it does not, your reply must start with exactly "I cannot answer this question." After that, if the context has closely related information (for example class timetables when the student asked for an exam timetable), say in one short sentence what you do have and cite it, and never present a class timetable as an exam timetable. Otherwise add one short sentence suggesting that the student checks the official website or contacts the college. Do not make anything up.
+- If the question asks for something harmful, dangerous or illegal (weapons, violence, self-harm, hacking), reply with only: "I can't help with that. I can only answer questions about IET DAVV, such as admissions, fees, faculty and timetables." Do not suggest the college website and do not cite anything.
+- If the question has nothing to do with the college, reply with only: "I can only answer questions about IET DAVV, such as admissions, fees, faculty and timetables."
 - If the question assumes something that does not exist or makes no sense for the college (for example a campus on Mars), reply with only "I cannot answer this question." Do not add other facts and do not cite anything.
 - Never mention "excerpts", "context", "provided documents" or "records" to the student. Speak as the assistant for the college website.
 - Be concise and direct. Use bullet points for lists (timetables, fees, dates, documents required, etc.).
@@ -92,6 +95,13 @@ export class RagService {
   async *stream(question: string, signal?: AbortSignal): AsyncGenerator<RagStreamEvent> {
     this.assertConfigured();
     const started = Date.now();
+
+    const refusal = unsafeReply(question);
+    if (refusal) {
+      yield { type: 'delta', text: refusal };
+      yield { type: 'done', answer: refusal, sources: [], attachments: [] };
+      return;
+    }
 
     const matches = await this.retrieve(question);
     const retrievedAt = Date.now();

@@ -1,4 +1,4 @@
-const { P, bullet, H1, H2, H3, table, figure, spacer } = require('./lib');
+const { P, bullet, H1, H2, H3, table, figure, spacer, tcap } = require('./lib');
 
 // Use case descriptions in the Rational format. Kept short and in plain words.
 const UCS = [
@@ -167,14 +167,14 @@ function chapter3(img) {
     H1('Chapter-3 Analysis & Design', { bm: 'ch3' }),
     H2('3.1 Software Requirements', { bm: 'c3_1' }),
     P('Table 3.1 lists the software we use and why. We also need three online services (Voyage AI, Pinecone and Google Gemini) with their API keys, and public access to the college website.'),
-    P('**Table 3.1: Software requirements**', { align: 'center', after: 80, keepNext: true }),
+    tcap('Table 3.1: Software requirements'),
     sw,
     spacer(),
     P('**Main requirements.** The system must collect and save the college text, answer questions with sources, give documents, keep chat history in the browser and report its health. It must answer within a few seconds, keep working when an online service is slow, keep secret keys on the server, and work on phones.'),
 
     H2('3.2 Hardware Requirements', { bm: 'c3_2' }),
     P('Query Campus needs no special hardware. The heavy work is done by online services, so ordinary computers are enough (Table 3.2).'),
-    P('**Table 3.2: Hardware requirements**', { align: 'center', after: 80, keepNext: true }),
+    tcap('Table 3.2: Hardware requirements'),
     hw,
     spacer(),
 

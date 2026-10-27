@@ -16,7 +16,7 @@ rectangle "**INTEGRATION LAYER**\n\nEmbeddingsService (Voyage client, query cach
 
 rectangle "**INDEXING LAYER**  (command-line scripts on a NestJS application context)\n\nScraperService (crawler)\nTimetableScraperService\nIngestionService + chunkDocument()\nEval script" as L4 #f3e6cf
 
-cloud "**EXTERNAL SERVICES**\nVoyage AI (embeddings)    Pinecone (vector database)    Google Gemini (generation)\nIET DAVV website (HTML, PDF)    Timetable portal (timetable.ietonline.in)" as EXT #e4f3e4
+cloud "**EXTERNAL SERVICES**\nVoyage AI (embeddings)    Pinecone (vector database)    Google Gemini (generation)\nIET DAVV website (HTML, PDF)    Timetable portal (timetable.ietdavv.edu.in)" as EXT #e4f3e4
 database "Local files: scraped.json, timetables.json,\nkeyword-chunks.json, eval results" as FS #f2f2f2
 
 L1 -down-> L2 : HTTP / JSON / SSE
